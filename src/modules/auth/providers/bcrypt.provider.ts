@@ -5,7 +5,7 @@ import { HashingProvider } from './hashing.provider';
 @Injectable()
 export class BcryptProvider implements HashingProvider {
   public async hashPassword(data: string | Buffer): Promise<string> {
-    const salt = await bcrypt.genSalt();
+    const salt = await bcrypt.genSalt(16);
     return bcrypt.hash(data, salt);
   }
 

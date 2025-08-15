@@ -1,0 +1,211 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateCustomerInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateCustomerSegmentInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateProductInput {
+  """Example field (placeholder)"""
+  exampleField: Int!
+}
+
+input CreateUserInput {
+  """User email"""
+  email: String!
+
+  """User first name"""
+  firstName: String!
+
+  """User last name"""
+  lastName: String!
+
+  """User password"""
+  password: String!
+
+  """User phone"""
+  phone: String!
+
+  """User role"""
+  role: Role!
+}
+
+type Customer {
+  address: String!
+  city: String!
+  companyName: String!
+  createdAt: DateTime
+  deletedAt: DateTime
+  id: ID!
+  updatedAt: DateTime
+}
+
+type CustomerSegment {
+  createdAt: DateTime
+  deletedAt: DateTime
+  description: String
+  id: ID!
+  name: String!
+  updatedAt: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""User gender enum"""
+enum Gender {
+  FEMALE
+  MALE
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type LoginOutput {
+  access_token: String!
+  refresh_token: String!
+}
+
+type Mutation {
+  createCustomer(createCustomerInput: CreateCustomerInput!): Customer!
+  createCustomerSegment(createCustomerSegmentInput: CreateCustomerSegmentInput!): CustomerSegment!
+  createProduct(createProductInput: CreateProductInput!): Product!
+  createUser(createUserInput: CreateUserInput!): User!
+  login(loginInput: LoginInput!): LoginOutput!
+  registerUser(signupInput: SignupInput!): User!
+  removeCustomer(id: Int!): Customer!
+  removeCustomerSegment(id: Int!): CustomerSegment!
+  removeProduct(id: Int!): Product!
+  removeUser(id: String!): User!
+  updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!
+  updateCustomerSegment(updateCustomerSegmentInput: UpdateCustomerSegmentInput!): CustomerSegment!
+  updateProduct(updateProductInput: UpdateProductInput!): Product!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Product {
+  """Product base price"""
+  basePrice: Float!
+  createdAt: DateTime
+  deletedAt: DateTime
+
+  """Product description"""
+  description: String!
+
+  """Product discount percentage"""
+  discountPercentage: Float!
+
+  """Product final price"""
+  finalPrice: Float!
+
+  """Product ID"""
+  id: ID!
+
+  """Product image"""
+  image: String!
+
+  """Product is active"""
+  isActive: Boolean!
+
+  """Product name"""
+  productName: String!
+
+  """Product SKU"""
+  sku: String!
+
+  """Product stock quantity"""
+  stockQuantity: Float!
+  updatedAt: DateTime
+}
+
+type Query {
+  customer(id: Int!): Customer!
+  customerSegment(id: Int!): CustomerSegment!
+  customerSegments: [CustomerSegment!]!
+  customers: [Customer!]!
+  product(id: Int!): Product!
+  products: [Product!]!
+  user(id: String!): User!
+  users: [User!]!
+}
+
+"""User role enum"""
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+input SignupInput {
+  email: String!
+  firstName: String!
+  gender: Gender
+  lastName: String!
+  password: String!
+  phone: String!
+  role: Role!
+}
+
+input UpdateCustomerInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateCustomerSegmentInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateProductInput {
+  """Example field (placeholder)"""
+  exampleField: Int
+  id: Int!
+}
+
+input UpdateUserInput {
+  """User email"""
+  email: String
+
+  """User first name"""
+  firstName: String
+  id: ID!
+
+  """User last name"""
+  lastName: String
+
+  """User password"""
+  password: String
+
+  """User phone"""
+  phone: String
+
+  """User role"""
+  role: Role
+}
+
+type User {
+  createdAt: DateTime
+  deletedAt: DateTime
+  email: String!
+  firstName: String!
+  gender: Gender
+  id: ID!
+  lastName: String!
+  password: String!
+  phone: String!
+  refreshToken: String!
+  role: Role!
+  updatedAt: DateTime
+}

@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { HashingProvider } from '../auth/providers/hashing.provider';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -10,10 +15,36 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private readonly hashingProvider: HashingProvider,
   ) {}
 
-  create(createUserInput: CreateUserInput): Promise<User> {
-    return this.usersRepository.save(createUserInput);
+  async create(createUserInput: CreateUserInput): Promise<User> {
+    const existingUserEmail = await this.usersRepository.findOneBy({
+      email: createUserInput.email,
+    });
+
+    if (existingUserEmail) {
+      throw new ConflictException('Email already exists');
+    }
+
+    const existingUserPhone = await this.usersRepository.findOneBy({
+      phone: createUserInput.phone,
+    });
+
+    if (existingUserPhone) {
+      throw new ConflictException('Phone number already exists');
+    }
+
+    const hashedPassword = await this.hashingProvider.hashPassword(
+      createUserInput.password,
+    );
+
+    const createdUser = this.usersRepository.create({
+      ...createUserInput,
+      password: hashedPassword,
+    });
+
+    return this.usersRepository.save(createdUser);
   }
 
   findAll(): Promise<User[]> {
@@ -48,6 +79,28 @@ export class UsersService {
 
   async findByEmail(email: string): Promise<User | null> {
     const user = await this.usersRepository.findOneBy({ email });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
+  async updateRefreshToken(id: string, refreshToken: string) {
+    const user = await this.usersRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const updatedUser = this.usersRepository.merge(user, { refreshToken });
+
+    return this.usersRepository.save(updatedUser);
+  }
+
+  async findByRefreshToken(refreshToken: string): Promise<User | null> {
+    const user = await this.usersRepository.findOneBy({ refreshToken });
 
     if (!user) {
       throw new NotFoundException('User not found');

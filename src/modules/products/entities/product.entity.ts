@@ -1,4 +1,10 @@
-import { Field, Float, ID, ObjectType } from '@nestjs/graphql';
+import {
+  Field,
+  Float,
+  GraphQLISODateTime,
+  ID,
+  ObjectType,
+} from '@nestjs/graphql';
 import { CustomerSegment } from 'src/modules/customer_segments/entities/customer_segment.entity';
 import {
   Column,
@@ -54,15 +60,15 @@ export class Product {
   @Column('boolean', { name: 'is_active' })
   isActive: boolean;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
 

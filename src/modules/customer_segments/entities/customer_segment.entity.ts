@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
 import { Product } from 'src/modules/products/entities/product.entity';
 import {
@@ -27,15 +27,15 @@ export class CustomerSegment {
   @Column('varchar', { length: 500, nullable: true })
   description?: string;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @Field(() => Date)
+  @Field(() => GraphQLISODateTime, { nullable: true })
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt: Date;
 
