@@ -137,7 +137,15 @@ type Query {
   product(id: Int!): Product!
   products: [Product!]!
   user(id: String!): User!
-  users: [User!]!
+  users(queryUserInput: QueryUserInput!): [User!]!
+}
+
+input QueryUserInput {
+  email: String
+  limit: Int! = 10
+  offset: Int! = 1
+  phone: String
+  role: Role
 }
 
 """User role enum"""
