@@ -6,7 +6,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
+import { Paginated } from '../pagination/interface/paginated.interface';
 import { CreateUserInput } from './dto/create-user.input';
+import { QueryUserInput } from './dto/query-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 
@@ -47,8 +49,31 @@ export class UsersService {
     return this.usersRepository.save(createdUser);
   }
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  async findAll(queryUserInput: QueryUserInput): Promise<Paginated<User>> {
+    const { offset = 1, limit = 10 } = queryUserInput;
+
+    const [users, total] = await this.usersRepository.findAndCount({
+      where: {
+        email: queryUserInput.email,
+        phone: queryUserInput.phone,
+        role: queryUserInput.role,
+      },
+      skip: (offset - 1) * limit,
+      take: limit,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return {
+      data: users,
+      meta: {
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        currentPage: offset,
+        itemsPerPage: limit,
+      },
+    };
   }
 
   findOne(id: string): Promise<User | null> {
