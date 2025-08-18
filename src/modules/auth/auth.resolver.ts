@@ -1,4 +1,7 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { CurrentUser } from 'src/decorators/user.decorator';
+import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
 import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
 import { LoginInput } from './dto/login.input';
@@ -22,5 +25,11 @@ export class AuthResolver {
   @Mutation(() => LoginOutput)
   async refreshToken(@Args('refreshToken') refreshToken: string) {
     return this.authService.refreshToken(refreshToken);
+  }
+
+  @Query(() => User)
+  @UseGuards(GqlAuthGuard)
+  me(@CurrentUser() user: User) {
+    return user;
   }
 }
