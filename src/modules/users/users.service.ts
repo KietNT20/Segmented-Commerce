@@ -6,7 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
-import { Paginated } from '../pagination/interface/paginated.interface';
+import {
+  Paginated,
+  SortOrder,
+} from '../pagination/interface/paginated.interface';
 import { CreateUserInput } from './dto/create-user.input';
 import { QueryUserInput } from './dto/query-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -50,7 +53,11 @@ export class UsersService {
   }
 
   async findAll(queryUserInput: QueryUserInput): Promise<Paginated<User>> {
-    const { offset = 1, limit = 10 } = queryUserInput;
+    const {
+      offset = 1,
+      limit = 10,
+      sortOrder = SortOrder.DESC,
+    } = queryUserInput;
 
     const [users, total] = await this.usersRepository.findAndCount({
       where: {
@@ -61,7 +68,10 @@ export class UsersService {
       skip: (offset - 1) * limit,
       take: limit,
       order: {
-        createdAt: 'DESC',
+        createdAt: sortOrder,
+      },
+      relations: {
+        customer: true,
       },
     });
 

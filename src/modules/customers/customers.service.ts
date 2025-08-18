@@ -1,26 +1,92 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import {
+  Paginated,
+  SortOrder,
+} from '../pagination/interface/paginated.interface';
 import { CreateCustomerInput } from './dto/create-customer.input';
+import { QueryCustomerInput } from './dto/query-customer.input';
 import { UpdateCustomerInput } from './dto/update-customer.input';
+import { Customer } from './entities/customer.entity';
 
 @Injectable()
 export class CustomersService {
-  create(createCustomerInput: CreateCustomerInput) {
-    return 'This action adds a new customer';
+  constructor(
+    @InjectRepository(Customer)
+    private customersRepository: Repository<Customer>,
+  ) {}
+
+  create(createCustomerInput: CreateCustomerInput): Promise<Customer> {
+    return this.customersRepository.save(createCustomerInput);
   }
 
-  findAll() {
-    return `This action returns all customers`;
+  async findAll(
+    queryCustomerInput: QueryCustomerInput,
+  ): Promise<Paginated<Customer>> {
+    const {
+      offset = 1,
+      limit = 10,
+      sortOrder = SortOrder.DESC,
+    } = queryCustomerInput;
+
+    const [customers, total] = await this.customersRepository.findAndCount({
+      skip: offset,
+      take: limit,
+      order: {
+        createdAt: sortOrder,
+      },
+      where: {
+        companyName: queryCustomerInput.companyName,
+        address: queryCustomerInput.address,
+        city: queryCustomerInput.city,
+      },
+      relations: {
+        segment: true,
+        user: true,
+      },
+    });
+
+    return {
+      data: customers,
+      meta: {
+        totalPages: Math.ceil(total / limit),
+        totalItems: total,
+        currentPage: offset,
+        itemsPerPage: limit,
+      },
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} customer`;
+  findOne(id: string): Promise<Customer | null> {
+    return this.customersRepository.findOneBy({ id });
   }
 
-  update(id: number, updateCustomerInput: UpdateCustomerInput) {
-    return `This action updates a #${id} customer`;
+  async update(
+    id: string,
+    updateCustomerInput: UpdateCustomerInput,
+  ): Promise<Customer> {
+    const customer = await this.customersRepository.findOneBy({ id });
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+
+    const updatedCustomer = this.customersRepository.merge(
+      customer,
+      updateCustomerInput,
+    );
+
+    return this.customersRepository.save(updatedCustomer);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  async remove(id: string): Promise<void> {
+    const customer = await this.customersRepository.findOneBy({ id });
+
+    if (!customer) {
+      throw new NotFoundException('Customer not found');
+    }
+
+    await this.customersRepository.softDelete(id);
   }
 }

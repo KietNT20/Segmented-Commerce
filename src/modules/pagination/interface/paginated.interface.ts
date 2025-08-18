@@ -7,3 +7,8 @@ export interface Paginated<T> {
     itemsPerPage: number;
   };
 }
+
+export enum SortOrder {
+  ASC = 'ASC',
+  DESC = 'DESC',
+}
