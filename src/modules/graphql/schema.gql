@@ -83,11 +83,12 @@ type Mutation {
   createProduct(createProductInput: CreateProductInput!): Product!
   createUser(createUserInput: CreateUserInput!): User!
   login(loginInput: LoginInput!): LoginOutput!
-  registerUser(signupInput: SignupInput!): User!
+  refreshToken(refreshToken: String!): LoginOutput!
   removeCustomer(id: Int!): Customer!
   removeCustomerSegment(id: Int!): CustomerSegment!
   removeProduct(id: Int!): Product!
   removeUser(id: String!): User!
+  signup(signupInput: SignupInput!): User!
   updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!
   updateCustomerSegment(updateCustomerSegmentInput: UpdateCustomerSegmentInput!): CustomerSegment!
   updateProduct(updateProductInput: UpdateProductInput!): Product!

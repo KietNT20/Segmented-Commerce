@@ -15,7 +15,12 @@ export class AuthResolver {
   }
 
   @Mutation(() => User)
-  async registerUser(@Args('signupInput') signupInput: SignupInput) {
+  async signup(@Args('signupInput') signupInput: SignupInput) {
     return this.authService.registerUser(signupInput);
+  }
+
+  @Mutation(() => LoginOutput)
+  async refreshToken(@Args('refreshToken') refreshToken: string) {
+    return this.authService.refreshToken(refreshToken);
   }
 }

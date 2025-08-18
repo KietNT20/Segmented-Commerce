@@ -9,7 +9,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'path';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { ErrorsInterceptor } from './interceptors/errors.interceptor';
-import { TransformInterceptor } from './interceptors/transform.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
 import { CustomerSegmentsModule } from './modules/customer_segments/customer_segments.module';
 import { CustomersModule } from './modules/customers/customers.module';
@@ -65,10 +64,6 @@ import { UsersModule } from './modules/users/users.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TransformInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,

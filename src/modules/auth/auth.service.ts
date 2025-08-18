@@ -28,18 +28,18 @@ export class AuthService {
     const payload: JwtPayload = {
       email: user.email,
       sub: user.id,
-      username: `${user.firstName} ${user.lastName}`,
+      full_name: `${user.firstName} ${user.lastName}`,
       role: user.role,
     };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_SECRET') as string,
-      expiresIn: this.configService.get('JWT_EXPIRES_IN') as string,
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET') as string,
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') as string,
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
     });
 
     await this.usersService.updateRefreshToken(user.id, refreshToken);
@@ -66,7 +66,7 @@ export class AuthService {
     const payload: JwtPayload = {
       email: user.email,
       sub: user.id,
-      username: `${user.firstName} ${user.lastName}`,
+      full_name: `${user.firstName} ${user.lastName}`,
       role: user.role,
     };
     const accessToken = this.jwtService.sign(payload, {
