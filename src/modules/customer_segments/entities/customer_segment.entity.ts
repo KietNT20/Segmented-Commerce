@@ -20,6 +20,10 @@ export class CustomerSegment {
   id: string;
 
   @Field(() => String)
+  @Column({ unique: true, length: 32, name: 'customer_segment_code' })
+  customerSegmentCode: string;
+
+  @Field(() => String)
   @Column({ unique: true, length: 255 })
   name: string;
 
