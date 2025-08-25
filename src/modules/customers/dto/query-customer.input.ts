@@ -12,6 +12,11 @@ export class FilterCustomerInput {
   @Field(() => String, { nullable: true })
   @IsOptional()
   @IsString()
+  customerCode?: string;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
   address?: string;
 
   @Field(() => String, { nullable: true })

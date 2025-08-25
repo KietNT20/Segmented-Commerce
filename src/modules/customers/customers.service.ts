@@ -37,6 +37,7 @@ export class CustomersService {
         createdAt: sortOrder,
       },
       where: {
+        customerCode: queryCustomerInput.customerCode,
         companyName: queryCustomerInput.companyName,
         address: queryCustomerInput.address,
         city: queryCustomerInput.city,

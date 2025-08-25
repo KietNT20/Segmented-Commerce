@@ -1,4 +1,5 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
+import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 @InputType()
@@ -13,6 +14,7 @@ export class CreateCustomerInput {
   @IsNotEmpty()
   @IsString()
   @MaxLength(32)
+  @Transform(({ value }: { value: string }) => value.toUpperCase())
   customerCode: string;
 
   @Field(() => String)
