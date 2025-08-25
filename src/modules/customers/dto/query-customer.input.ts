@@ -25,6 +25,7 @@ export class FilterCustomerInput {
   city?: string;
 }
 
+@InputType()
 export class QueryCustomerInput extends IntersectionType(
   FilterCustomerInput,
   PaginationInput,

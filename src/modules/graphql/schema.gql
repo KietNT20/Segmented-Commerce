@@ -3,13 +3,19 @@
 # ------------------------------------------------------
 
 input CreateCustomerInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  address: String!
+  city: String!
+  companyName: String
+  customerCode: String!
+  customerSegmentId: ID!
 }
 
 input CreateCustomerSegmentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Description of the customer segment"""
+  description: String
+
+  """Name of the customer segment"""
+  name: String!
 }
 
 input CreateProductInput {
@@ -18,6 +24,9 @@ input CreateProductInput {
 }
 
 input CreateUserInput {
+  """Customer ID"""
+  customerId: ID
+
   """User email"""
   email: String!
 
@@ -42,6 +51,7 @@ type Customer {
   city: String!
   companyName: String!
   createdAt: DateTime
+  customerCode: String!
   deletedAt: DateTime
   id: ID!
   updatedAt: DateTime
@@ -49,6 +59,7 @@ type Customer {
 
 type CustomerSegment {
   createdAt: DateTime
+  customerSegmentCode: String!
   deletedAt: DateTime
   description: String
   id: ID!
@@ -68,7 +79,10 @@ enum Gender {
 }
 
 input LoginInput {
+  """User email"""
   email: String!
+
+  """User password"""
   password: String!
 }
 
@@ -84,7 +98,7 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   login(loginInput: LoginInput!): LoginOutput!
   refreshToken(refreshToken: String!): LoginOutput!
-  removeCustomer(id: Int!): Customer!
+  removeCustomer(id: ID!): Customer!
   removeCustomerSegment(id: Int!): CustomerSegment!
   removeProduct(id: Int!): Product!
   removeUser(id: String!): User!
@@ -131,14 +145,25 @@ type Product {
 }
 
 type Query {
-  customer(id: Int!): Customer!
+  customer(id: ID!): Customer!
   customerSegment(id: Int!): CustomerSegment!
   customerSegments: [CustomerSegment!]!
-  customers: [Customer!]!
+  customers(queryCustomerInput: QueryCustomerInput!): [Customer!]!
+  me: User!
   product(id: Int!): Product!
   products: [Product!]!
   user(id: String!): User!
   users(queryUserInput: QueryUserInput!): [User!]!
+}
+
+input QueryCustomerInput {
+  address: String
+  city: String
+  companyName: String
+  customerCode: String
+  limit: Int! = 10
+  offset: Int! = 1
+  sortOrder: SortOrder = DESC
 }
 
 input QueryUserInput {
@@ -147,6 +172,7 @@ input QueryUserInput {
   offset: Int! = 1
   phone: String
   role: Role
+  sortOrder: SortOrder = DESC
 }
 
 """User role enum"""
@@ -156,25 +182,49 @@ enum Role {
 }
 
 input SignupInput {
+  """User email"""
   email: String!
+
+  """User first name"""
   firstName: String!
+
+  """User gender"""
   gender: Gender
+
+  """User last name"""
   lastName: String!
+
+  """User password"""
   password: String!
+
+  """User phone number"""
   phone: String!
+
+  """User role"""
   role: Role!
 }
 
+enum SortOrder {
+  ASC
+  DESC
+}
+
 input UpdateCustomerInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  address: String
+  city: String
+  companyName: String
+  customerCode: String
+  customerSegmentId: ID
+  id: ID!
 }
 
 input UpdateCustomerSegmentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
+  """Description of the customer segment"""
+  description: String
   id: Int!
+
+  """Name of the customer segment"""
+  name: String
 }
 
 input UpdateProductInput {
@@ -184,6 +234,9 @@ input UpdateProductInput {
 }
 
 input UpdateUserInput {
+  """Customer ID"""
+  customerId: ID
+
   """User email"""
   email: String
 
