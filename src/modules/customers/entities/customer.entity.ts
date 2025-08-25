@@ -21,6 +21,10 @@ export class Customer {
   id: string;
 
   @Field(() => String)
+  @Column({ length: 32, unique: true, name: 'customer_code' })
+  customerCode: string;
+
+  @Field(() => String)
   @Column({ length: 255, nullable: true, name: 'company_name' })
   companyName?: string;
 

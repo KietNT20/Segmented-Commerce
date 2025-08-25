@@ -12,6 +12,12 @@ export class CreateCustomerInput {
   @Field(() => String)
   @IsNotEmpty()
   @IsString()
+  @MaxLength(32)
+  customerCode: string;
+
+  @Field(() => String)
+  @IsNotEmpty()
+  @IsString()
   @MaxLength(255)
   address: string;
 
