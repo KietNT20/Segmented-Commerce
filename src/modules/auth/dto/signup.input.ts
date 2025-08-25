@@ -14,11 +14,11 @@ import { Gender, Role } from 'src/modules/users/enums';
 
 @InputType()
 export class SignupInput {
-  @Field(() => String)
+  @Field(() => String, { description: 'User email' })
   @IsEmail()
   email: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: 'User password' })
   @IsNotEmpty()
   @IsString()
   @MinLength(8)
@@ -29,17 +29,17 @@ export class SignupInput {
   })
   password: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: 'User first name' })
   @IsNotEmpty()
   @IsString()
   firstName: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: 'User last name' })
   @IsNotEmpty()
   @IsString()
   lastName: string;
 
-  @Field(() => String)
+  @Field(() => String, { description: 'User phone number' })
   @IsNotEmpty()
   @IsString()
   @Matches(REGEX.VN_PHONE, {
@@ -47,12 +47,12 @@ export class SignupInput {
   })
   phone: string;
 
-  @Field(() => Role)
+  @Field(() => Role, { description: 'User role' })
   @IsNotEmpty()
   @IsEnum(Role)
   role: Role;
 
-  @Field(() => Gender, { nullable: true })
+  @Field(() => Gender, { nullable: true, description: 'User gender' })
   @IsOptional()
   @IsEnum(Gender)
   gender?: Gender;

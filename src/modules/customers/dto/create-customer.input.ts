@@ -1,4 +1,4 @@
-import { Field, InputType } from '@nestjs/graphql';
+import { Field, ID, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 @InputType()
@@ -20,4 +20,10 @@ export class CreateCustomerInput {
   @IsString()
   @MaxLength(255)
   city: string;
+
+  @Field(() => ID)
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(255)
+  customerSegmentId: string;
 }

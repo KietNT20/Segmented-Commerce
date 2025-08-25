@@ -6,6 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
+import { Customer } from '../customers/entities/customer.entity';
 import {
   Paginated,
   SortOrder,
@@ -20,6 +21,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Customer)
+    private customersRepository: Repository<Customer>,
     private readonly hashingProvider: HashingProvider,
   ) {}
 
@@ -38,6 +41,16 @@ export class UsersService {
 
     if (existingUserPhone) {
       throw new ConflictException('Phone number already exists');
+    }
+
+    if (createUserInput.customerId) {
+      const customer = await this.customersRepository.findOneBy({
+        id: createUserInput.customerId,
+      });
+
+      if (!customer) {
+        throw new NotFoundException('Customer not found');
+      }
     }
 
     const hashedPassword = await this.hashingProvider.hashPassword(
