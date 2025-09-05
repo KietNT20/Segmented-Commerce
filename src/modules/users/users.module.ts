@@ -8,15 +8,15 @@ import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, Customer])],
-  providers: [
-    UsersResolver,
-    UsersService,
-    {
-      provide: HashingProvider,
-      useClass: BcryptProvider,
-    },
-  ],
-  exports: [UsersService],
+    imports: [TypeOrmModule.forFeature([User, Customer])],
+    providers: [
+        UsersResolver,
+        UsersService,
+        {
+            provide: HashingProvider,
+            useClass: BcryptProvider,
+        },
+    ],
+    exports: [UsersService],
 })
 export class UsersModule {}

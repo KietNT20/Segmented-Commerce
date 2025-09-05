@@ -11,18 +11,18 @@ import { LocalStrategy } from './strategies/local.strategy';
 import { JwtRefreshTokenStrategy } from './strategies/refreshToken.strategy';
 
 @Module({
-  imports: [PassportModule, JwtModule, UsersModule],
-  providers: [
-    AuthResolver,
-    AuthService,
-    {
-      provide: HashingProvider,
-      useClass: BcryptProvider,
-    },
-    JwtStrategy,
-    JwtRefreshTokenStrategy,
-    LocalStrategy,
-  ],
-  exports: [AuthService],
+    imports: [PassportModule, JwtModule, UsersModule],
+    providers: [
+        AuthResolver,
+        AuthService,
+        {
+            provide: HashingProvider,
+            useClass: BcryptProvider,
+        },
+        JwtStrategy,
+        JwtRefreshTokenStrategy,
+        LocalStrategy,
+    ],
+    exports: [AuthService],
 })
 export class AuthModule {}

@@ -7,37 +7,39 @@ import { Customer } from './entities/customer.entity';
 
 @Resolver(() => Customer)
 export class CustomersResolver {
-  constructor(private readonly customersService: CustomersService) {}
+    constructor(private readonly customersService: CustomersService) {}
 
-  @Mutation(() => Customer)
-  createCustomer(
-    @Args('createCustomerInput') createCustomerInput: CreateCustomerInput,
-  ) {
-    return this.customersService.create(createCustomerInput);
-  }
+    @Mutation(() => Customer)
+    createCustomer(
+        @Args('createCustomerInput') createCustomerInput: CreateCustomerInput,
+    ) {
+        return this.customersService.create(createCustomerInput);
+    }
 
-  @Query(() => [Customer], { name: 'customers' })
-  findAll(@Args('queryCustomerInput') queryCustomerInput: QueryCustomerInput) {
-    return this.customersService.findAll(queryCustomerInput);
-  }
+    @Query(() => [Customer], { name: 'customers' })
+    findAll(
+        @Args('queryCustomerInput') queryCustomerInput: QueryCustomerInput,
+    ) {
+        return this.customersService.findAll(queryCustomerInput);
+    }
 
-  @Query(() => Customer, { name: 'customer' })
-  findOne(@Args('id', { type: () => ID }) id: string) {
-    return this.customersService.findOne(id);
-  }
+    @Query(() => Customer, { name: 'customer' })
+    findOne(@Args('id', { type: () => ID }) id: string) {
+        return this.customersService.findOne(id);
+    }
 
-  @Mutation(() => Customer)
-  updateCustomer(
-    @Args('updateCustomerInput') updateCustomerInput: UpdateCustomerInput,
-  ) {
-    return this.customersService.update(
-      updateCustomerInput.id,
-      updateCustomerInput,
-    );
-  }
+    @Mutation(() => Customer)
+    updateCustomer(
+        @Args('updateCustomerInput') updateCustomerInput: UpdateCustomerInput,
+    ) {
+        return this.customersService.update(
+            updateCustomerInput.id,
+            updateCustomerInput,
+        );
+    }
 
-  @Mutation(() => Customer)
-  removeCustomer(@Args('id', { type: () => ID }) id: string) {
-    return this.customersService.remove(id);
-  }
+    @Mutation(() => Customer)
+    removeCustomer(@Args('id', { type: () => ID }) id: string) {
+        return this.customersService.remove(id);
+    }
 }

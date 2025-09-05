@@ -5,8 +5,8 @@ import { CustomerSegmentsService } from './customer_segments.service';
 import { CustomerSegment } from './entities/customer_segment.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CustomerSegment])],
-  providers: [CustomerSegmentsResolver, CustomerSegmentsService],
-  exports: [CustomerSegmentsService],
+    imports: [TypeOrmModule.forFeature([CustomerSegment])],
+    providers: [CustomerSegmentsResolver, CustomerSegmentsService],
+    exports: [CustomerSegmentsService],
 })
 export class CustomerSegmentsModule {}

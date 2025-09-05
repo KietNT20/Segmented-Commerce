@@ -1,20 +1,20 @@
 import { registerEnumType } from '@nestjs/graphql';
 
 export interface Paginated<T> {
-  data: T[];
-  meta: {
-    totalPages: number;
-    totalItems: number;
-    currentPage: number;
-    itemsPerPage: number;
-  };
+    data: T[];
+    meta: {
+        totalPages: number;
+        totalItems: number;
+        currentPage: number;
+        itemsPerPage: number;
+    };
 }
 
 export enum SortOrder {
-  ASC = 'ASC',
-  DESC = 'DESC',
+    ASC = 'ASC',
+    DESC = 'DESC',
 }
 
 registerEnumType(SortOrder, {
-  name: 'SortOrder',
+    name: 'SortOrder',
 });

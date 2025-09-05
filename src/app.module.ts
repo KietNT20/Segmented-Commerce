@@ -16,63 +16,66 @@ import { ProductsModule } from './modules/products/products.module';
 import { UsersModule } from './modules/users/users.module';
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-      isGlobal: true,
-    }),
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/modules/graphql/schema.gql'),
-      sortSchema: true,
-      playground: false,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
-    }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('DATABASE_HOST'),
-        port: +configService.get('DATABASE_PORT'),
-        username: configService.get('DATABASE_USERNAME'),
-        password: configService.get('DATABASE_PASSWORD'),
-        database: configService.get('DATABASE_NAME'),
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true,
-        autoLoadEntities: true,
-      }),
-      inject: [ConfigService],
-    }),
-    BullModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        connection: {
-          host: configService.get('REDIS_HOST'),
-          port: +configService.get('REDIS_PORT'),
+    imports: [
+        ConfigModule.forRoot({
+            envFilePath: '.env',
+            isGlobal: true,
+        }),
+        GraphQLModule.forRoot<ApolloDriverConfig>({
+            driver: ApolloDriver,
+            autoSchemaFile: join(
+                process.cwd(),
+                'src/modules/graphql/schema.gql',
+            ),
+            sortSchema: true,
+            playground: false,
+            plugins: [ApolloServerPluginLandingPageLocalDefault()],
+        }),
+        TypeOrmModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                type: 'postgres',
+                host: configService.get('DATABASE_HOST'),
+                port: +configService.get('DATABASE_PORT'),
+                username: configService.get('DATABASE_USERNAME'),
+                password: configService.get('DATABASE_PASSWORD'),
+                database: configService.get('DATABASE_NAME'),
+                entities: [__dirname + '/**/*.entity{.ts,.js}'],
+                synchronize: true,
+                autoLoadEntities: true,
+            }),
+            inject: [ConfigService],
+        }),
+        BullModule.forRootAsync({
+            imports: [ConfigModule],
+            useFactory: (configService: ConfigService) => ({
+                connection: {
+                    host: configService.get('REDIS_HOST'),
+                    port: +configService.get('REDIS_PORT'),
+                },
+            }),
+            inject: [ConfigService],
+        }),
+        CustomersModule,
+        ProductsModule,
+        CustomerSegmentsModule,
+        AuthModule,
+        UsersModule,
+    ],
+    controllers: [],
+    providers: [
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: ClassSerializerInterceptor,
         },
-      }),
-      inject: [ConfigService],
-    }),
-    CustomersModule,
-    ProductsModule,
-    CustomerSegmentsModule,
-    AuthModule,
-    UsersModule,
-  ],
-  controllers: [],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ClassSerializerInterceptor,
-    },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: ErrorsInterceptor,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: HttpExceptionFilter,
-    },
-  ],
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: ErrorsInterceptor,
+        },
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter,
+        },
+    ],
 })
 export class AppModule {}

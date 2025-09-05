@@ -10,26 +10,26 @@ import { SignupInput } from './dto/signup.input';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => LoginOutput)
-  async login(@Args('loginInput') loginInput: LoginInput) {
-    return this.authService.login(loginInput);
-  }
+    @Mutation(() => LoginOutput)
+    async login(@Args('loginInput') loginInput: LoginInput) {
+        return this.authService.login(loginInput);
+    }
 
-  @Mutation(() => User)
-  async signup(@Args('signupInput') signupInput: SignupInput) {
-    return this.authService.registerUser(signupInput);
-  }
+    @Mutation(() => User)
+    async signup(@Args('signupInput') signupInput: SignupInput) {
+        return this.authService.registerUser(signupInput);
+    }
 
-  @Mutation(() => LoginOutput)
-  async refreshToken(@Args('refreshToken') refreshToken: string) {
-    return this.authService.refreshToken(refreshToken);
-  }
+    @Mutation(() => LoginOutput)
+    async refreshToken(@Args('refreshToken') refreshToken: string) {
+        return this.authService.refreshToken(refreshToken);
+    }
 
-  @Query(() => User)
-  @UseGuards(GqlAuthGuard)
-  me(@CurrentUser() user: User) {
-    return user;
-  }
+    @Query(() => User)
+    @UseGuards(GqlAuthGuard)
+    me(@CurrentUser() user: User) {
+        return user;
+    }
 }

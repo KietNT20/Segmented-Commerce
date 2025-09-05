@@ -11,98 +11,104 @@ import { HashingProvider } from './providers/hashing.provider';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly usersService: UsersService,
-    private jwtService: JwtService,
-    private readonly hashingProvider: HashingProvider,
-    private readonly configService: ConfigService,
-  ) {}
+    constructor(
+        private readonly usersService: UsersService,
+        private jwtService: JwtService,
+        private readonly hashingProvider: HashingProvider,
+        private readonly configService: ConfigService,
+    ) {}
 
-  async login(loginInput: LoginInput): Promise<LoginOutput> {
-    const user = await this.validateUser(loginInput.email, loginInput.password);
+    async login(loginInput: LoginInput): Promise<LoginOutput> {
+        const user = await this.validateUser(
+            loginInput.email,
+            loginInput.password,
+        );
 
-    if (!user) {
-      throw new UnauthorizedException();
+        if (!user) {
+            throw new UnauthorizedException();
+        }
+
+        const payload: JwtPayload = {
+            email: user.email,
+            sub: user.id,
+            full_name: `${user.firstName} ${user.lastName}`,
+            role: user.role,
+        };
+
+        const accessToken = this.jwtService.sign(payload, {
+            secret: this.configService.get<string>('JWT_SECRET'),
+            expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+        });
+
+        const refreshToken = this.jwtService.sign(payload, {
+            secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
+        });
+
+        await this.usersService.updateRefreshToken(user.id, refreshToken);
+
+        return {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+        };
     }
 
-    const payload: JwtPayload = {
-      email: user.email,
-      sub: user.id,
-      full_name: `${user.firstName} ${user.lastName}`,
-      role: user.role,
-    };
+    async registerUser(signupInput: SignupInput): Promise<User> {
+        const createdUser = await this.usersService.create(signupInput);
 
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
-    });
-
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
-    });
-
-    await this.usersService.updateRefreshToken(user.id, refreshToken);
-
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
-  }
-
-  async registerUser(signupInput: SignupInput): Promise<User> {
-    const createdUser = await this.usersService.create(signupInput);
-
-    return createdUser;
-  }
-
-  async refreshToken(oldRefreshToken: string) {
-    const user = await this.usersService.findByRefreshToken(oldRefreshToken);
-
-    if (!user) {
-      throw new UnauthorizedException();
+        return createdUser;
     }
 
-    const payload: JwtPayload = {
-      email: user.email,
-      sub: user.id,
-      full_name: `${user.firstName} ${user.lastName}`,
-      role: user.role,
-    };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_SECRET') as string,
-      expiresIn: this.configService.get('JWT_EXPIRES_IN') as string,
-    });
+    async refreshToken(oldRefreshToken: string) {
+        const user =
+            await this.usersService.findByRefreshToken(oldRefreshToken);
 
-    const refreshToken = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_SECRET') as string,
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN') as string,
-    });
+        if (!user) {
+            throw new UnauthorizedException();
+        }
 
-    await this.usersService.updateRefreshToken(user.id, refreshToken);
+        const payload: JwtPayload = {
+            email: user.email,
+            sub: user.id,
+            full_name: `${user.firstName} ${user.lastName}`,
+            role: user.role,
+        };
+        const accessToken = this.jwtService.sign(payload, {
+            secret: this.configService.get('JWT_SECRET') as string,
+            expiresIn: this.configService.get('JWT_EXPIRES_IN') as string,
+        });
 
-    return {
-      access_token: accessToken,
-      refresh_token: refreshToken,
-    };
-  }
+        const refreshToken = this.jwtService.sign(payload, {
+            secret: this.configService.get('JWT_REFRESH_SECRET') as string,
+            expiresIn: this.configService.get(
+                'JWT_REFRESH_EXPIRES_IN',
+            ) as string,
+        });
 
-  async validateUser(email: string, password: string) {
-    try {
-      const user = await this.usersService.findByEmail(email);
+        await this.usersService.updateRefreshToken(user.id, refreshToken);
 
-      const authenticated = await this.hashingProvider.comparePassword(
-        password,
-        user?.password as string,
-      );
-
-      if (!authenticated) {
-        throw new UnauthorizedException();
-      }
-
-      return user;
-    } catch {
-      throw new UnauthorizedException();
+        return {
+            access_token: accessToken,
+            refresh_token: refreshToken,
+        };
     }
-  }
+
+    async validateUser(email: string, password: string) {
+        try {
+            const user = await this.usersService.findByEmail(email);
+
+            const authenticated = await this.hashingProvider.comparePassword(
+                password,
+                user?.password as string,
+            );
+
+            if (!authenticated) {
+                throw new UnauthorizedException();
+            }
+
+            return user;
+        } catch {
+            throw new UnauthorizedException();
+        }
+    }
 }

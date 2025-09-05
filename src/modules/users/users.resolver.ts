@@ -14,33 +14,33 @@ import { UsersService } from './users.service';
 @UseGuards(GqlAuthGuard, RolesGuard)
 @Roles([Role.ADMIN])
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+    constructor(private readonly usersService: UsersService) {}
 
-  @Mutation(() => User)
-  createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
-  }
+    @Mutation(() => User)
+    createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
+        return this.usersService.create(createUserInput);
+    }
 
-  @Query(() => [User], { name: 'users' })
-  findAll(
-    @Args('queryUserInput', { type: () => QueryUserInput })
-    queryUserInput: QueryUserInput,
-  ) {
-    return this.usersService.findAll(queryUserInput);
-  }
+    @Query(() => [User], { name: 'users' })
+    findAll(
+        @Args('queryUserInput', { type: () => QueryUserInput })
+        queryUserInput: QueryUserInput,
+    ) {
+        return this.usersService.findAll(queryUserInput);
+    }
 
-  @Query(() => User, { name: 'user' })
-  findOne(@Args('id', { type: () => String }) id: string) {
-    return this.usersService.findOne(id);
-  }
+    @Query(() => User, { name: 'user' })
+    findOne(@Args('id', { type: () => String }) id: string) {
+        return this.usersService.findOne(id);
+    }
 
-  @Mutation(() => User)
-  updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return this.usersService.update(updateUserInput.id, updateUserInput);
-  }
+    @Mutation(() => User)
+    updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
+        return this.usersService.update(updateUserInput.id, updateUserInput);
+    }
 
-  @Mutation(() => User)
-  removeUser(@Args('id', { type: () => String }) id: string) {
-    return this.usersService.remove(id);
-  }
+    @Mutation(() => User)
+    removeUser(@Args('id', { type: () => String }) id: string) {
+        return this.usersService.remove(id);
+    }
 }
