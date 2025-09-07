@@ -39,6 +39,11 @@ export class CustomersResolver {
     }
 
     @Mutation(() => Customer)
+    softRemoveCustomer(@Args('id', { type: () => ID }) id: string) {
+        return this.customersService.softRemove(id);
+    }
+
+    @Mutation(() => Customer)
     removeCustomer(@Args('id', { type: () => ID }) id: string) {
         return this.customersService.remove(id);
     }

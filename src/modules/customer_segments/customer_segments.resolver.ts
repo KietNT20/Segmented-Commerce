@@ -1,8 +1,8 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CustomerSegmentsService } from './customer_segments.service';
-import { CustomerSegment } from './entities/customer_segment.entity';
 import { CreateCustomerSegmentInput } from './dto/create-customer_segment.input';
 import { UpdateCustomerSegmentInput } from './dto/update-customer_segment.input';
+import { CustomerSegment } from './entities/customer_segment.entity';
 
 @Resolver(() => CustomerSegment)
 export class CustomerSegmentsResolver {
@@ -24,7 +24,7 @@ export class CustomerSegmentsResolver {
     }
 
     @Query(() => CustomerSegment, { name: 'customerSegment' })
-    findOne(@Args('id', { type: () => Int }) id: number) {
+    findOne(@Args('id', { type: () => ID }) id: string) {
         return this.customerSegmentsService.findOne(id);
     }
 
@@ -40,7 +40,7 @@ export class CustomerSegmentsResolver {
     }
 
     @Mutation(() => CustomerSegment)
-    removeCustomerSegment(@Args('id', { type: () => Int }) id: number) {
+    removeCustomerSegment(@Args('id', { type: () => ID }) id: string) {
         return this.customerSegmentsService.remove(id);
     }
 }

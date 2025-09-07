@@ -14,6 +14,8 @@ import { CustomerSegmentsModule } from './modules/customer_segments/customer_seg
 import { CustomersModule } from './modules/customers/customers.module';
 import { ProductsModule } from './modules/products/products.module';
 import { UsersModule } from './modules/users/users.module';
+import { ProductUnitModule } from './modules/product_unit/product_unit.module';
+import { ProductPricesModule } from './modules/product_prices/product_prices.module';
 
 @Module({
     imports: [
@@ -61,6 +63,8 @@ import { UsersModule } from './modules/users/users.module';
         CustomerSegmentsModule,
         AuthModule,
         UsersModule,
+        ProductUnitModule,
+        ProductPricesModule,
     ],
     controllers: [],
     providers: [

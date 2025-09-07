@@ -5,14 +5,14 @@ import {
     ID,
     ObjectType,
 } from '@nestjs/graphql';
-import { CustomerSegment } from 'src/modules/customer_segments/entities/customer_segment.entity';
+import { ProductPrice } from 'src/modules/product_prices/entities/product_price.entity';
+import { ProductUnit } from 'src/modules/product_unit/entities/product_unit.entity';
 import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
-    JoinTable,
-    ManyToMany,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
@@ -44,14 +44,6 @@ export class Product {
     @Column('numeric', { precision: 15, scale: 0, name: 'base_price' })
     basePrice: number;
 
-    @Field(() => Float, { description: 'Product final price' })
-    @Column('numeric', { precision: 15, scale: 0, name: 'final_price' })
-    finalPrice: number;
-
-    @Field(() => Float, { description: 'Product discount percentage' })
-    @Column('float', { name: 'discount_percentage' })
-    discountPercentage: number;
-
     @Field(() => Float, { description: 'Product stock quantity' })
     @Column('int', { name: 'stock_quantity' })
     stockQuantity: number;
@@ -72,17 +64,11 @@ export class Product {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt: Date;
 
-    @ManyToMany(() => CustomerSegment, (segment) => segment.products)
-    @JoinTable({
-        name: 'product_prices',
-        joinColumn: {
-            name: 'product_id',
-            referencedColumnName: 'id',
-        },
-        inverseJoinColumn: {
-            name: 'segment_id',
-            referencedColumnName: 'id',
-        },
-    })
-    segments: CustomerSegment[];
+    @Field(() => [ProductUnit])
+    @OneToMany(() => ProductUnit, (unit) => unit.product, { cascade: true })
+    units: ProductUnit[];
+
+    @Field(() => [ProductPrice])
+    @OneToMany(() => ProductPrice, (price) => price.product, { cascade: true })
+    prices: ProductPrice[];
 }

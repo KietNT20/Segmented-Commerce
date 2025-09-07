@@ -81,7 +81,7 @@ export class CustomersService {
         return this.customersRepository.save(updatedCustomer);
     }
 
-    async remove(id: string): Promise<void> {
+    async softRemove(id: string): Promise<void> {
         const customer = await this.customersRepository.findOneBy({ id });
 
         if (!customer) {
@@ -89,5 +89,15 @@ export class CustomersService {
         }
 
         await this.customersRepository.softDelete(id);
+    }
+
+    async remove(id: string): Promise<void> {
+        const customer = await this.customersRepository.findOneBy({ id });
+
+        if (!customer) {
+            throw new NotFoundException('Customer not found');
+        }
+
+        await this.customersRepository.delete(id);
     }
 }

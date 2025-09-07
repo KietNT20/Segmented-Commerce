@@ -1,12 +1,11 @@
 import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
-import { Product } from 'src/modules/products/entities/product.entity';
+import { ProductPrice } from 'src/modules/product_prices/entities/product_price.entity';
 import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
-    ManyToMany,
     OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
@@ -43,9 +42,13 @@ export class CustomerSegment {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt: Date;
 
-    @ManyToMany(() => Product, (product) => product.segments)
-    products: Product[];
+    @Field(() => [ProductPrice])
+    @OneToMany(() => ProductPrice, (price) => price.customerSegment, {
+        cascade: true,
+    })
+    prices: ProductPrice[];
 
+    @Field(() => [Customer])
     @OneToMany(() => Customer, (customer) => customer.segment)
     customers: Customer[];
 }

@@ -48,10 +48,12 @@ export class Customer {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt: Date;
 
+    @Field(() => CustomerSegment)
     @ManyToOne(() => CustomerSegment, (segment) => segment.customers)
     @JoinColumn({ name: 'segment_id' })
     segment: CustomerSegment;
 
+    @Field(() => User)
     @OneToOne(() => User, (user) => user.customer)
     user: User;
 }

@@ -66,6 +66,7 @@ export class User {
     @DeleteDateColumn({ name: 'deleted_at' })
     deletedAt: Date;
 
+    @Field(() => Customer)
     @OneToOne(() => Customer, (customer) => customer.user, {
         cascade: true,
     })
