@@ -1,6 +1,7 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CustomerSegmentsService } from './customer_segments.service';
 import { CreateCustomerSegmentInput } from './dto/create-customer_segment.input';
+import { QueryCustomerSegmentInput } from './dto/query-customer_segment.input';
 import { UpdateCustomerSegmentInput } from './dto/update-customer_segment.input';
 import { CustomerSegment } from './entities/customer_segment.entity';
 
@@ -19,8 +20,13 @@ export class CustomerSegmentsResolver {
     }
 
     @Query(() => [CustomerSegment], { name: 'customerSegments' })
-    findAll() {
-        return this.customerSegmentsService.findAll();
+    findAll(
+        @Args('queryCustomerSegmentInput', {
+            type: () => QueryCustomerSegmentInput,
+        })
+        queryCustomerSegmentInput: QueryCustomerSegmentInput,
+    ) {
+        return this.customerSegmentsService.findAll(queryCustomerSegmentInput);
     }
 
     @Query(() => CustomerSegment, { name: 'customerSegment' })
