@@ -1,8 +1,9 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { ProductPricesService } from './product_prices.service';
-import { ProductPrice } from './entities/product_price.entity';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateProductPriceInput } from './dto/create-product_price.input';
+import { QueryProductPriceInput } from './dto/query-product_price.input';
 import { UpdateProductPriceInput } from './dto/update-product_price.input';
+import { ProductPrice } from './entities/product_price.entity';
+import { ProductPricesService } from './product_prices.service';
 
 @Resolver(() => ProductPrice)
 export class ProductPricesResolver {
@@ -17,12 +18,15 @@ export class ProductPricesResolver {
     }
 
     @Query(() => [ProductPrice], { name: 'productPrices' })
-    findAll() {
-        return this.productPricesService.findAll();
+    findAll(
+        @Args('queryProductPriceInput')
+        queryProductPriceInput: QueryProductPriceInput,
+    ) {
+        return this.productPricesService.findAll(queryProductPriceInput);
     }
 
     @Query(() => ProductPrice, { name: 'productPrice' })
-    findOne(@Args('id', { type: () => Int }) id: number) {
+    findOne(@Args('id', { type: () => ID }) id: string) {
         return this.productPricesService.findOne(id);
     }
 
@@ -38,7 +42,7 @@ export class ProductPricesResolver {
     }
 
     @Mutation(() => ProductPrice)
-    removeProductPrice(@Args('id', { type: () => Int }) id: number) {
+    removeProductPrice(@Args('id', { type: () => ID }) id: string) {
         return this.productPricesService.remove(id);
     }
 }

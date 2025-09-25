@@ -20,8 +20,8 @@ export class PaginationInput {
     @IsOptional()
     @IsNumber()
     @IsPositive()
-    @Min(1)
-    offset?: number = 1;
+    @Min(0)
+    offset?: number = 0;
 
     @Field(() => Int, { defaultValue: 10 })
     @IsOptional()

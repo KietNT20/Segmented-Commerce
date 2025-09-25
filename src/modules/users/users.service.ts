@@ -67,7 +67,7 @@ export class UsersService {
 
     async findAll(queryUserInput: QueryUserInput): Promise<Paginated<User>> {
         const {
-            offset = 1,
+            offset = 0,
             limit = 10,
             sortOrder = SortOrder.DESC,
         } = queryUserInput;

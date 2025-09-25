@@ -25,7 +25,7 @@ export class CustomersService {
         queryCustomerInput: QueryCustomerInput,
     ): Promise<Paginated<Customer>> {
         const {
-            offset = 1,
+            offset = 0,
             limit = 10,
             sortOrder = SortOrder.DESC,
         } = queryCustomerInput;
