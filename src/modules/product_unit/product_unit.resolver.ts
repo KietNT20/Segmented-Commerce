@@ -1,8 +1,8 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { ProductUnitService } from './product_unit.service';
-import { ProductUnit } from './entities/product_unit.entity';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateProductUnitInput } from './dto/create-product_unit.input';
 import { UpdateProductUnitInput } from './dto/update-product_unit.input';
+import { ProductUnit } from './entities/product_unit.entity';
+import { ProductUnitService } from './product_unit.service';
 
 @Resolver(() => ProductUnit)
 export class ProductUnitResolver {
@@ -16,13 +16,13 @@ export class ProductUnitResolver {
         return this.productUnitService.create(createProductUnitInput);
     }
 
-    @Query(() => [ProductUnit], { name: 'productUnit' })
+    @Query(() => [ProductUnit], { name: 'productUnits' })
     findAll() {
         return this.productUnitService.findAll();
     }
 
     @Query(() => ProductUnit, { name: 'productUnit' })
-    findOne(@Args('id', { type: () => Int }) id: number) {
+    findOne(@Args('id', { type: () => ID }) id: string) {
         return this.productUnitService.findOne(id);
     }
 
@@ -37,8 +37,8 @@ export class ProductUnitResolver {
         );
     }
 
-    @Mutation(() => ProductUnit)
-    removeProductUnit(@Args('id', { type: () => Int }) id: number) {
+    @Mutation(() => Boolean)
+    removeProductUnit(@Args('id', { type: () => ID }) id: string) {
         return this.productUnitService.remove(id);
     }
 }
