@@ -16,7 +16,7 @@ export class PaginationInput {
     @IsEnum(SortOrder)
     sortOrder?: SortOrder = SortOrder.DESC;
 
-    @Field(() => Int, { defaultValue: 1 })
+    @Field(() => Int, { defaultValue: 0 })
     @IsOptional()
     @IsNumber()
     @IsPositive()
