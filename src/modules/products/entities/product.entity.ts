@@ -3,6 +3,7 @@ import {
     Float,
     GraphQLISODateTime,
     ID,
+    Int,
     ObjectType,
 } from '@nestjs/graphql';
 import { ProductPrice } from 'src/modules/product_prices/entities/product_price.entity';
@@ -36,21 +37,13 @@ export class Product {
     @Column({ unique: true })
     sku: string;
 
-    @Field(() => String, { description: 'Product image' })
-    @Column({ nullable: true })
-    image?: string;
-
     @Field(() => Float, { description: 'Product base price' })
     @Column('numeric', { precision: 15, scale: 0, name: 'base_price' })
     basePrice: number;
 
-    @Field(() => Float, { description: 'Product stock quantity' })
+    @Field(() => Int, { description: 'Product stock quantity' })
     @Column('int', { name: 'stock_quantity' })
     stockQuantity: number;
-
-    @Field(() => Boolean, { description: 'Product is active' })
-    @Column('boolean', { name: 'is_active' })
-    isActive: boolean;
 
     @Field(() => GraphQLISODateTime, { nullable: true })
     @CreateDateColumn({ name: 'created_at' })

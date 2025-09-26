@@ -19,8 +19,20 @@ input CreateCustomerSegmentInput {
 }
 
 input CreateProductInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  """Product base price"""
+  basePrice: Float!
+
+  """Product description"""
+  description: String
+
+  """Product name"""
+  productName: String!
+
+  """Product SKU"""
+  sku: String!
+
+  """Product stock quantity"""
+  stockQuantity: Int!
 }
 
 input CreateProductPriceInput {
@@ -28,10 +40,10 @@ input CreateProductPriceInput {
   customerSegmentId: String!
 
   """Phần trăm giảm giá cho phân khúc này"""
-  discountPercentage: Int!
+  discountPercentage: Float!
 
   """Giá cuối cùng cho phân khúc này"""
-  finalPrice: Int!
+  finalPrice: Float!
 
   """ID của sản phẩm"""
   productId: String!
@@ -137,7 +149,7 @@ type Mutation {
   refreshToken(refreshToken: String!): LoginOutput!
   removeCustomer(id: ID!): Customer!
   removeCustomerSegment(id: ID!): CustomerSegment!
-  removeProduct(id: Int!): Product!
+  removeProduct(id: ID!): Product!
   removeProductPrice(id: ID!): ProductPrice!
   removeProductUnit(id: ID!): Boolean!
   removeUser(id: String!): User!
@@ -162,12 +174,6 @@ type Product {
 
   """Product ID"""
   id: ID!
-
-  """Product image"""
-  image: String!
-
-  """Product is active"""
-  isActive: Boolean!
   prices: [ProductPrice!]!
 
   """Product name"""
@@ -177,7 +183,7 @@ type Product {
   sku: String!
 
   """Product stock quantity"""
-  stockQuantity: Float!
+  stockQuantity: Int!
   units: [ProductUnit!]!
   updatedAt: DateTime
 }
@@ -221,12 +227,12 @@ type Query {
   customerSegments(queryCustomerSegmentInput: QueryCustomerSegmentInput!): [CustomerSegment!]!
   customers(queryCustomerInput: QueryCustomerInput!): [Customer!]!
   me: User!
-  product(id: Int!): Product!
+  product(id: ID!): Product!
   productPrice(id: ID!): ProductPrice!
   productPrices(queryProductPriceInput: QueryProductPriceInput!): [ProductPrice!]!
   productUnit(id: ID!): ProductUnit!
   productUnits: [ProductUnit!]!
-  products: [Product!]!
+  products(queryProductInput: QueryProductInput!): [Product!]!
   user(id: String!): User!
   users(queryUserInput: QueryUserInput!): [User!]!
 }
@@ -246,6 +252,14 @@ input QueryCustomerSegmentInput {
   limit: Int! = 10
   name: String
   offset: Int! = 0
+  sortOrder: SortOrder = DESC
+}
+
+input QueryProductInput {
+  limit: Int! = 10
+  offset: Int! = 0
+  productName: String
+  productSKU: String
   sortOrder: SortOrder = DESC
 }
 
@@ -310,12 +324,16 @@ input UpdateCustomerInput {
   companyName: String
   customerCode: String
   customerSegmentId: ID
+
+  """Customer ID"""
   id: ID!
 }
 
 input UpdateCustomerSegmentInput {
   """Description of the customer segment"""
   description: String
+
+  """Customer Segment ID"""
   id: ID!
 
   """Name of the customer segment"""
@@ -323,9 +341,23 @@ input UpdateCustomerSegmentInput {
 }
 
 input UpdateProductInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  """Product base price"""
+  basePrice: Float
+
+  """Product description"""
+  description: String
+
+  """Product ID"""
+  id: ID!
+
+  """Product name"""
+  productName: String
+
+  """Product SKU"""
+  sku: String
+
+  """Product stock quantity"""
+  stockQuantity: Int
 }
 
 input UpdateProductPriceInput {
@@ -333,10 +365,12 @@ input UpdateProductPriceInput {
   customerSegmentId: String
 
   """Phần trăm giảm giá cho phân khúc này"""
-  discountPercentage: Int
+  discountPercentage: Float
 
   """Giá cuối cùng cho phân khúc này"""
-  finalPrice: Int
+  finalPrice: Float
+
+  """Product Price ID"""
   id: ID!
 
   """ID của sản phẩm"""

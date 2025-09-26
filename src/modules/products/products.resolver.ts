@@ -1,8 +1,9 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
-import { ProductsService } from './products.service';
-import { Product } from './entities/product.entity';
+import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateProductInput } from './dto/create-product.input';
+import { QueryProductInput } from './dto/query-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
+import { Product } from './entities/product.entity';
+import { ProductsService } from './products.service';
 
 @Resolver(() => Product)
 export class ProductsResolver {
@@ -16,12 +17,12 @@ export class ProductsResolver {
     }
 
     @Query(() => [Product], { name: 'products' })
-    findAll() {
-        return this.productsService.findAll();
+    findAll(@Args('queryProductInput') queryProductInput: QueryProductInput) {
+        return this.productsService.findAll(queryProductInput);
     }
 
     @Query(() => Product, { name: 'product' })
-    findOne(@Args('id', { type: () => Int }) id: number) {
+    findOne(@Args('id', { type: () => ID }) id: string) {
         return this.productsService.findOne(id);
     }
 
@@ -36,7 +37,7 @@ export class ProductsResolver {
     }
 
     @Mutation(() => Product)
-    removeProduct(@Args('id', { type: () => Int }) id: number) {
+    removeProduct(@Args('id', { type: () => ID }) id: string) {
         return this.productsService.remove(id);
     }
 }

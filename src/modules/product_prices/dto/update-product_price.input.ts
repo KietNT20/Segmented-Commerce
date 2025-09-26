@@ -5,6 +5,6 @@ import { CreateProductPriceInput } from './create-product_price.input';
 export class UpdateProductPriceInput extends PartialType(
     CreateProductPriceInput,
 ) {
-    @Field(() => ID)
+    @Field(() => ID, { description: 'Product Price ID' })
     id: string;
 }

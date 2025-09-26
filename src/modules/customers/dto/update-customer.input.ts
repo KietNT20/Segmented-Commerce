@@ -3,6 +3,6 @@ import { CreateCustomerInput } from './create-customer.input';
 
 @InputType()
 export class UpdateCustomerInput extends PartialType(CreateCustomerInput) {
-    @Field(() => ID)
+    @Field(() => ID, { description: 'Customer ID' })
     id: string;
 }

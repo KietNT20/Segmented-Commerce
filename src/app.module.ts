@@ -6,22 +6,37 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as Joi from 'joi';
 import { join } from 'path';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { ErrorsInterceptor } from './interceptors/errors.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
 import { CustomerSegmentsModule } from './modules/customer_segments/customer_segments.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { ProductPricesModule } from './modules/product_prices/product_prices.module';
+import { ProductUnitModule } from './modules/product_unit/product_unit.module';
 import { ProductsModule } from './modules/products/products.module';
 import { UsersModule } from './modules/users/users.module';
-import { ProductUnitModule } from './modules/product_unit/product_unit.module';
-import { ProductPricesModule } from './modules/product_prices/product_prices.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot({
             envFilePath: '.env',
             isGlobal: true,
+            validationSchema: Joi.object({
+                PORT: Joi.number().port().default(3000),
+                DATABASE_HOST: Joi.string().required(),
+                DATABASE_PORT: Joi.number().port().default(5432),
+                DATABASE_USERNAME: Joi.string().required(),
+                DATABASE_PASSWORD: Joi.string().required(),
+                DATABASE_NAME: Joi.string().required(),
+                JWT_SECRET: Joi.string().required(),
+                JWT_EXPIRES_IN: Joi.string().default('60s'),
+                JWT_REFRESH_SECRET: Joi.string().required(),
+                JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+                REDIS_HOST: Joi.string().default('localhost'),
+                REDIS_PORT: Joi.number().port().default(6379),
+            }),
         }),
         GraphQLModule.forRoot<ApolloDriverConfig>({
             driver: ApolloDriver,

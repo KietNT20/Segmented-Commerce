@@ -5,6 +5,6 @@ import { CreateCustomerSegmentInput } from './create-customer_segment.input';
 export class UpdateCustomerSegmentInput extends PartialType(
     CreateCustomerSegmentInput,
 ) {
-    @Field(() => ID)
+    @Field(() => ID, { description: 'Customer Segment ID' })
     id: string;
 }
