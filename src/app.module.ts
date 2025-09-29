@@ -81,7 +81,6 @@ import { UsersModule } from './modules/users/users.module';
         ProductUnitModule,
         ProductPricesModule,
     ],
-    controllers: [],
     providers: [
         {
             provide: APP_INTERCEPTOR,
