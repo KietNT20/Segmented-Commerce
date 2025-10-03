@@ -13,7 +13,7 @@ export class AuthResolver {
     constructor(private readonly authService: AuthService) {}
 
     @Mutation(() => LoginOutput)
-    async login(@Args('loginInput') loginInput: LoginInput) {
+    async signin(@Args('signinInput') loginInput: LoginInput) {
         return this.authService.login(loginInput);
     }
 
