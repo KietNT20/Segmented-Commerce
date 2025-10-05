@@ -17,7 +17,6 @@ import { ProductPricesModule } from './modules/product_prices/product_prices.mod
 import { ProductUnitModule } from './modules/product_unit/product_unit.module';
 import { ProductsModule } from './modules/products/products.module';
 import { UsersModule } from './modules/users/users.module';
-
 @Module({
     imports: [
         ConfigModule.forRoot({

@@ -145,7 +145,6 @@ type Mutation {
   createProductPrice(createProductPriceInput: CreateProductPriceInput!): ProductPrice!
   createProductUnit(createProductUnitInput: CreateProductUnitInput!): ProductUnit!
   createUser(createUserInput: CreateUserInput!): User!
-  login(loginInput: LoginInput!): LoginOutput!
   refreshToken(refreshToken: String!): LoginOutput!
   removeCustomer(id: ID!): Customer!
   removeCustomerSegment(id: ID!): CustomerSegment!
@@ -153,6 +152,7 @@ type Mutation {
   removeProductPrice(id: ID!): ProductPrice!
   removeProductUnit(id: ID!): Boolean!
   removeUser(id: String!): User!
+  signin(signinInput: LoginInput!): LoginOutput!
   signup(signupInput: SignupInput!): User!
   softRemoveCustomer(id: ID!): Customer!
   updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!

@@ -18,7 +18,7 @@ export class AuthService {
         private readonly configService: ConfigService,
     ) {}
 
-    async login(loginInput: LoginInput): Promise<LoginOutput> {
+    async loginUser(loginInput: LoginInput): Promise<LoginOutput> {
         const user = await this.validateUser(
             loginInput.email,
             loginInput.password,
