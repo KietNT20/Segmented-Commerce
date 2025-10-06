@@ -21,7 +21,7 @@ export class User {
     id: string;
 
     @Field(() => String)
-    @Column({ length: 255, unique: true })
+    @Column('varchar', { length: 255, unique: true })
     email: string;
 
     @Field(() => String)
@@ -30,23 +30,23 @@ export class User {
     password: string;
 
     @Field(() => String)
-    @Column({ length: 255, name: 'first_name' })
+    @Column('varchar', { length: 255, name: 'first_name' })
     firstName: string;
 
     @Field(() => String)
-    @Column({ length: 255, name: 'last_name' })
+    @Column('varchar', { length: 255, name: 'last_name' })
     lastName: string;
 
-    @Field(() => String)
-    @Column({ length: 11, unique: true, name: 'phone_number' })
-    phone: string;
+    @Field(() => String, { nullable: true })
+    @Column('varchar', { length: 11, unique: true, name: 'phone_number' })
+    phone?: string;
 
     @Field(() => Gender, { nullable: true })
     @Column({ type: 'enum', enum: Gender, nullable: true })
     gender?: Gender;
 
-    @Field(() => String)
-    @Column({ nullable: true, name: 'refresh_token' })
+    @Field(() => String, { nullable: true })
+    @Column('varchar', { nullable: true, name: 'refresh_token' })
     @Exclude()
     refreshToken?: string;
 

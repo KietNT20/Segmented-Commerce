@@ -429,8 +429,8 @@ type User {
   id: ID!
   lastName: String!
   password: String!
-  phone: String!
-  refreshToken: String!
+  phone: String
+  refreshToken: String
   role: Role!
   updatedAt: DateTime
 }
