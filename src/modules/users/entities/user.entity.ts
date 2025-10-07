@@ -38,7 +38,12 @@ export class User {
     lastName: string;
 
     @Field(() => String, { nullable: true })
-    @Column('varchar', { length: 11, unique: true, name: 'phone_number' })
+    @Column('varchar', {
+        nullable: true,
+        length: 11,
+        unique: true,
+        name: 'phone_number',
+    })
     phone?: string;
 
     @Field(() => Gender, { nullable: true })

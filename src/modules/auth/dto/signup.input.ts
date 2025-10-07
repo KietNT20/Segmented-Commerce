@@ -39,13 +39,13 @@ export class SignupInput {
     @IsString()
     lastName: string;
 
-    @Field(() => String, { description: 'User phone number' })
-    @IsNotEmpty()
+    @Field(() => String, { nullable: true, description: 'User phone number' })
+    @IsOptional()
     @IsString()
     @Matches(REGEX.VN_PHONE, {
         message: 'Phone number must be a valid Vietnamese phone number',
     })
-    phone: string;
+    phone?: string;
 
     @Field(() => Role, { description: 'User role' })
     @IsNotEmpty()

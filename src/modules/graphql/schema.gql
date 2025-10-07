@@ -83,7 +83,7 @@ input CreateUserInput {
   password: String!
 
   """User phone"""
-  phone: String!
+  phone: String
 
   """User role"""
   role: Role!
@@ -307,7 +307,7 @@ input SignupInput {
   password: String!
 
   """User phone number"""
-  phone: String!
+  phone: String
 
   """User role"""
   role: Role!

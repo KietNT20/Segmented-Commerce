@@ -41,13 +41,13 @@ export class CreateUserInput {
     @IsString()
     lastName: string;
 
-    @Field(() => String, { description: 'User phone' })
-    @IsNotEmpty()
+    @Field(() => String, { nullable: true, description: 'User phone' })
+    @IsOptional()
     @IsString()
     @Matches(REGEX.VN_PHONE, {
         message: 'Phone number must be a valid Vietnamese phone number',
     })
-    phone: string;
+    phone?: string;
 
     @Field(() => Role, { description: 'User role' })
     @IsNotEmpty()

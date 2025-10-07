@@ -37,12 +37,14 @@ export class UsersService {
             throw new ConflictException('Email already exists');
         }
 
-        const existingUserPhone = await this.usersRepository.findOneBy({
-            phone: createUserInput.phone,
-        });
+        if (createUserInput.phone) {
+            const existingUserPhone = await this.usersRepository.findOneBy({
+                phone: createUserInput.phone,
+            });
 
-        if (existingUserPhone) {
-            throw new ConflictException('Phone number already exists');
+            if (existingUserPhone) {
+                throw new ConflictException('Phone number already exists');
+            }
         }
 
         if (createUserInput.customerId) {
