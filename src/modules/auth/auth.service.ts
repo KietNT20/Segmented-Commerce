@@ -24,15 +24,11 @@ export class AuthService {
             loginInput.password,
         );
 
-        if (!user) {
-            throw new UnauthorizedException();
-        }
-
         const payload: JwtPayload = {
-            email: user.email,
-            sub: user.id,
-            full_name: `${user.firstName} ${user.lastName}`,
-            role: user.role,
+            email: user!.email,
+            sub: user!.id,
+            full_name: `${user!.firstName} ${user!.lastName}`,
+            role: user!.role,
         };
 
         const accessToken = this.jwtService.sign(payload, {
@@ -45,7 +41,7 @@ export class AuthService {
             expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
         });
 
-        await this.usersService.updateRefreshToken(user.id, refreshToken);
+        await this.usersService.updateRefreshToken(user!.id, refreshToken);
 
         return {
             access_token: accessToken,
@@ -94,21 +90,17 @@ export class AuthService {
     }
 
     async validateUser(email: string, password: string) {
-        try {
-            const user = await this.usersService.findByEmail(email);
+        const user = await this.usersService.findByEmail(email);
 
-            const authenticated = await this.hashingProvider.comparePassword(
-                password,
-                user?.password as string,
-            );
+        const authenticated = await this.hashingProvider.comparePassword(
+            password,
+            user?.password as string,
+        );
 
-            if (!authenticated) {
-                throw new UnauthorizedException();
-            }
-
-            return user;
-        } catch {
-            throw new UnauthorizedException();
+        if (!authenticated) {
+            throw new UnauthorizedException('Email or password is invalid');
         }
+
+        return user;
     }
 }

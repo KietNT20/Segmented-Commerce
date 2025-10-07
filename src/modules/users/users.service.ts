@@ -1,9 +1,11 @@
 import {
     ConflictException,
+    ForbiddenException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { jwtDecode } from 'jwt-decode';
 import { Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
 import { Customer } from '../customers/entities/customer.entity';
@@ -142,16 +144,25 @@ export class UsersService {
             throw new NotFoundException('User not found');
         }
 
-        const updatedUser = this.usersRepository.merge(user, { refreshToken });
+        const hashedRefreshToken =
+            await this.hashingProvider.hashPassword(refreshToken);
+
+        const updatedUser = this.usersRepository.merge(user, {
+            refreshToken: hashedRefreshToken,
+        });
 
         return this.usersRepository.save(updatedUser);
     }
 
     async findByRefreshToken(refreshToken: string): Promise<User | null> {
-        const user = await this.usersRepository.findOneBy({ refreshToken });
+        const decodedRefreshToken = jwtDecode(refreshToken);
+
+        const user = await this.usersRepository.findOneBy({
+            id: decodedRefreshToken.sub as string,
+        });
 
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new ForbiddenException('Access Denied');
         }
 
         return user;
