@@ -1,7 +1,5 @@
-import { Field, InputType } from '@nestjs/graphql';
-import { Type } from 'class-transformer';
-import { IsString, ValidateNested } from 'class-validator';
-import { Permission } from '../../permissions/entities/permission.etity';
+import { Field, ID, InputType } from '@nestjs/graphql';
+import { ArrayMinSize, IsString, IsUUID } from 'class-validator';
 
 @InputType()
 export class CreateRoleInput {
@@ -9,8 +7,8 @@ export class CreateRoleInput {
     @IsString()
     roleName: string;
 
-    @Field(() => [Permission])
-    @ValidateNested()
-    @Type(() => Permission)
-    permissionds: Permission[];
+    @Field(() => [ID])
+    @IsUUID('4', { each: true })
+    @ArrayMinSize(1)
+    permissionIds: string[];
 }

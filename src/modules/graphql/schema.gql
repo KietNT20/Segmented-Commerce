@@ -2,6 +2,14 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""Action enum for access control"""
+enum Action {
+  CREATE
+  DELETE
+  READ
+  UPDATE
+}
+
 input CreateCustomerInput {
   address: String!
   city: String!
@@ -16,6 +24,11 @@ input CreateCustomerSegmentInput {
 
   """Name of the customer segment"""
   name: String!
+}
+
+input CreatePermissionInput {
+  action: [Action!]!
+  resource: Resource!
 }
 
 input CreateProductInput {
@@ -66,6 +79,11 @@ input CreateProductUnitInput {
   unitName: String!
 }
 
+input CreateRoleInput {
+  permissionIds: [ID!]!
+  roleName: String!
+}
+
 input CreateUserInput {
   """Customer ID"""
   customerId: ID
@@ -76,6 +94,9 @@ input CreateUserInput {
   """User first name"""
   firstName: String!
 
+  """User gender"""
+  gender: Gender
+
   """User last name"""
   lastName: String!
 
@@ -85,8 +106,8 @@ input CreateUserInput {
   """User phone"""
   phone: String
 
-  """User role"""
-  role: Role!
+  """List of Role IDs assigned to user"""
+  userRoleIds: [ID!]!
 }
 
 type Customer {
@@ -141,26 +162,38 @@ type LoginOutput {
 type Mutation {
   createCustomer(createCustomerInput: CreateCustomerInput!): Customer!
   createCustomerSegment(createCustomerSegmentInput: CreateCustomerSegmentInput!): CustomerSegment!
+  createPermission(createPermissionInput: CreatePermissionInput!): Permission!
   createProduct(createProductInput: CreateProductInput!): Product!
   createProductPrice(createProductPriceInput: CreateProductPriceInput!): ProductPrice!
   createProductUnit(createProductUnitInput: CreateProductUnitInput!): ProductUnit!
+  createRole(createRoleInput: CreateRoleInput!): Role!
   createUser(createUserInput: CreateUserInput!): User!
   refreshToken(refreshToken: String!): LoginOutput!
   removeCustomer(id: ID!): Customer!
   removeCustomerSegment(id: ID!): CustomerSegment!
+  removePermission(id: ID!): Permission!
   removeProduct(id: ID!): Product!
   removeProductPrice(id: ID!): ProductPrice!
   removeProductUnit(id: ID!): Boolean!
+  removeRole(id: ID!): Role!
   removeUser(id: String!): User!
   signin(signinInput: LoginInput!): LoginOutput!
   signup(signupInput: SignupInput!): User!
   softRemoveCustomer(id: ID!): Customer!
   updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!
   updateCustomerSegment(updateCustomerSegmentInput: UpdateCustomerSegmentInput!): CustomerSegment!
+  updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   updateProductPrice(updateProductPriceInput: UpdateProductPriceInput!): ProductPrice!
   updateProductUnit(updateProductUnitInput: UpdateProductUnitInput!): ProductUnit!
+  updateRole(updateRoleInput: UpdateRoleInput!): Role!
   updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type Permission {
+  action: [Action!]!
+  id: ID!
+  resource: Resource!
 }
 
 type Product {
@@ -227,12 +260,16 @@ type Query {
   customerSegments(queryCustomerSegmentInput: QueryCustomerSegmentInput!): [CustomerSegment!]!
   customers(queryCustomerInput: QueryCustomerInput!): [Customer!]!
   me: User!
+  permission(id: ID!): Permission!
+  permissions: [Permission!]!
   product(id: ID!): Product!
   productPrice(id: ID!): ProductPrice!
   productPrices(queryProductPriceInput: QueryProductPriceInput!): [ProductPrice!]!
   productUnit(id: ID!): ProductUnit!
   productUnits: [ProductUnit!]!
   products(queryProductInput: QueryProductInput!): [Product!]!
+  role(id: ID!): Role!
+  roles: [Role!]!
   user(id: String!): User!
   users(queryUserInput: QueryUserInput!): [User!]!
 }
@@ -280,14 +317,24 @@ input QueryUserInput {
   limit: Int! = 10
   offset: Int! = 0
   phone: String
-  role: Role
+  roleIds: [ID!]
   sortOrder: SortOrder = DESC
 }
 
-"""User role enum"""
-enum Role {
-  ADMIN
-  CUSTOMER
+"""Resource enum for access control"""
+enum Resource {
+  BUSINESSES
+  CUSTOMERS
+  PRODUCTS
+  ROLES
+  SETTINGS
+  USERS
+}
+
+type Role {
+  id: ID!
+  permissions: [Permission!]!
+  roleName: String!
 }
 
 input SignupInput {
@@ -309,8 +356,8 @@ input SignupInput {
   """User phone number"""
   phone: String
 
-  """User role"""
-  role: Role!
+  """List of Role IDs assigned to user"""
+  roleIds: [ID!]!
 }
 
 enum SortOrder {
@@ -338,6 +385,12 @@ input UpdateCustomerSegmentInput {
 
   """Name of the customer segment"""
   name: String
+}
+
+input UpdatePermissionInput {
+  action: [Action!]
+  id: ID!
+  resource: Resource
 }
 
 input UpdateProductInput {
@@ -395,6 +448,12 @@ input UpdateProductUnitInput {
   unitName: String
 }
 
+input UpdateRoleInput {
+  id: ID!
+  permissionIds: [ID!]
+  roleName: String
+}
+
 input UpdateUserInput {
   """Customer ID"""
   customerId: ID
@@ -404,6 +463,9 @@ input UpdateUserInput {
 
   """User first name"""
   firstName: String
+
+  """User gender"""
+  gender: Gender
   id: ID!
 
   """User last name"""
@@ -415,8 +477,8 @@ input UpdateUserInput {
   """User phone"""
   phone: String
 
-  """User role"""
-  role: Role
+  """List of Role IDs assigned to user"""
+  userRoleIds: [ID!]
 }
 
 type User {
@@ -431,6 +493,6 @@ type User {
   password: String!
   phone: String
   refreshToken: String
-  role: Role!
   updatedAt: DateTime
+  userRoles: [Role!]!
 }

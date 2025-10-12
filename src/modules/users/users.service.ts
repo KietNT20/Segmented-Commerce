@@ -97,17 +97,18 @@ export class UsersService {
             sortOrder = SortOrder.DESC,
             email,
             phone,
-            roles,
+            roleIds,
         } = queryUserInput;
 
         const query = this.usersRepository
             .createQueryBuilder('user')
             .leftJoinAndSelect('user.customer', 'customer');
 
-        const needJoinRole = roles && roles.length > 0;
+        const needJoinRole = roleIds && roleIds.length > 0;
 
         if (needJoinRole) {
-            query.innerJoin('user.roles', 'role');
+            query.innerJoin('user.userRoles', 'userRole');
+            query.innerJoin('userRole.role', 'role');
         }
 
         if (email) {
@@ -118,11 +119,8 @@ export class UsersService {
             query.andWhere('user.phone LIKE :phone', { phone: `%${phone}%` });
         }
 
-        if (roles && roles.length > 0) {
-            const roleNames = roles.map((r) =>
-                typeof r === 'string' ? r : r.roleName,
-            );
-            query.andWhere('role.roleName IN (:...roleNames)', { roleNames });
+        if (roleIds && roleIds.length > 0) {
+            query.andWhere('role.id IN (:...roleIds)', { roleIds });
         }
 
         const total = await query.getCount();

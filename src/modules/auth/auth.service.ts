@@ -11,12 +11,13 @@ import { HashingProvider } from './providers/hashing.provider';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private readonly usersService: UsersService,
         private jwtService: JwtService,
         private readonly hashingProvider: HashingProvider,
         private readonly configService: ConfigService,
-        private readonly logger = new Logger(AuthService.name),
     ) {}
 
     async loginUser(loginInput: LoginInput): Promise<LoginOutput> {

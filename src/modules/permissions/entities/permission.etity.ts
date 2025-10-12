@@ -1,9 +1,10 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Role } from 'src/modules/roles/entities/role.entity';
 import { Action, Resource } from 'src/modules/roles/enums';
-import { Column, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @ObjectType()
+@Entity()
 export class Permission {
     @Field(() => ID)
     @PrimaryGeneratedColumn('uuid')

@@ -1,7 +1,6 @@
-import { Field, InputType, IntersectionType } from '@nestjs/graphql';
-import { IsOptional, IsString } from 'class-validator';
+import { Field, ID, InputType, IntersectionType } from '@nestjs/graphql';
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationInput } from 'src/modules/pagination/dto/pagination.input';
-import { Role } from 'src/modules/roles/entities/role.entity';
 
 @InputType()
 export class FilterUserInput {
@@ -15,9 +14,10 @@ export class FilterUserInput {
     @IsString()
     phone?: string;
 
-    @Field(() => [Role], { nullable: true })
+    @Field(() => [ID], { nullable: true })
     @IsOptional()
-    roles?: Role[];
+    @IsUUID(4, { each: true })
+    roleIds?: string[];
 }
 
 @InputType()
