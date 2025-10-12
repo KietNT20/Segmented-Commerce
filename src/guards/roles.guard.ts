@@ -7,8 +7,8 @@ import {
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { Roles } from 'src/decorators/roles.decorator';
+import { Role } from 'src/modules/roles/entities/role.entity';
 import { User } from 'src/modules/users/entities/user.entity';
-import { Role } from 'src/modules/users/enums';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -26,7 +26,11 @@ export class RolesGuard implements CanActivate {
         const request = context.switchToHttp().getRequest<Request>();
         const user = request.user as User;
 
-        const hasRole = roles.some((role: Role) => user.role === role);
+        const hasRole = roles.some((roleName: string) =>
+            user.userRoles.some(
+                (userRole: Role) => userRole.roleName === roleName,
+            ),
+        );
 
         if (!hasRole) {
             throw new ForbiddenException(

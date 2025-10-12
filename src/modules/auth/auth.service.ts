@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
@@ -16,6 +16,7 @@ export class AuthService {
         private jwtService: JwtService,
         private readonly hashingProvider: HashingProvider,
         private readonly configService: ConfigService,
+        private readonly logger = new Logger(AuthService.name),
     ) {}
 
     async loginUser(loginInput: LoginInput): Promise<LoginOutput> {
@@ -28,7 +29,7 @@ export class AuthService {
             email: user!.email,
             sub: user!.id,
             full_name: `${user!.firstName} ${user!.lastName}`,
-            role: user!.role,
+            role_ids: user!.userRoles.map((role) => role.id),
         };
 
         const accessToken = this.jwtService.sign(payload, {
@@ -50,7 +51,11 @@ export class AuthService {
     }
 
     async registerUser(signupInput: SignupInput): Promise<User> {
-        const createdUser = await this.usersService.create(signupInput);
+        const createdUser = await this.usersService.create({
+            ...signupInput,
+            userRoleIds: signupInput.roleIds,
+            gender: undefined,
+        });
 
         return createdUser;
     }
@@ -67,8 +72,9 @@ export class AuthService {
             email: user.email,
             sub: user.id,
             full_name: `${user.firstName} ${user.lastName}`,
-            role: user.role,
+            role_ids: user.userRoles.map((role) => role.id),
         };
+
         const accessToken = this.jwtService.sign(payload, {
             secret: this.configService.get('JWT_SECRET') as string,
             expiresIn: this.configService.get('JWT_EXPIRES_IN') as string,
@@ -102,5 +108,17 @@ export class AuthService {
         }
 
         return user;
+    }
+
+    verifyToken(token: string) {
+        try {
+            const decoded = this.jwtService.verify<JwtPayload>(token, {
+                secret: this.configService.get<string>('JWT_SECRET'),
+            });
+            return decoded;
+        } catch (error) {
+            this.logger.error(error);
+            throw new UnauthorizedException('Invalid token');
+        }
     }
 }

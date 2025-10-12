@@ -1,7 +1,7 @@
 import { Field, InputType, IntersectionType } from '@nestjs/graphql';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 import { PaginationInput } from 'src/modules/pagination/dto/pagination.input';
-import { Role } from '../enums';
+import { Role } from 'src/modules/roles/entities/role.entity';
 
 @InputType()
 export class FilterUserInput {
@@ -15,10 +15,9 @@ export class FilterUserInput {
     @IsString()
     phone?: string;
 
-    @Field(() => Role, { nullable: true })
+    @Field(() => [Role], { nullable: true })
     @IsOptional()
-    @IsEnum(Role)
-    role?: Role;
+    roles?: Role[];
 }
 
 @InputType()

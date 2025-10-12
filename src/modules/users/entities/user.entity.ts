@@ -1,17 +1,21 @@
 import { Field, GraphQLISODateTime, ID, ObjectType } from '@nestjs/graphql';
 import { Exclude } from 'class-transformer';
 import { Customer } from 'src/modules/customers/entities/customer.entity';
+import { Role } from 'src/modules/roles/entities/role.entity';
 import {
     Column,
     CreateDateColumn,
     DeleteDateColumn,
     Entity,
+    Index,
     JoinColumn,
+    JoinTable,
+    ManyToMany,
     OneToOne,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm';
-import { Gender, Role } from '../enums';
+import { Gender } from '../enums/gender.enum';
 
 @ObjectType()
 @Entity()
@@ -21,6 +25,7 @@ export class User {
     id: string;
 
     @Field(() => String)
+    @Index({ unique: true })
     @Column('varchar', { length: 255, unique: true })
     email: string;
 
@@ -38,6 +43,7 @@ export class User {
     lastName: string;
 
     @Field(() => String, { nullable: true })
+    @Index({ unique: true })
     @Column('varchar', {
         nullable: true,
         length: 11,
@@ -54,10 +60,6 @@ export class User {
     @Column('varchar', { nullable: true, name: 'refresh_token' })
     @Exclude()
     refreshToken?: string;
-
-    @Field(() => Role)
-    @Column({ type: 'enum', enum: Role })
-    role: Role;
 
     @Field(() => GraphQLISODateTime, { nullable: true })
     @CreateDateColumn({ name: 'created_at' })
@@ -77,4 +79,13 @@ export class User {
     })
     @JoinColumn({ name: 'customer_id' })
     customer: Customer;
+
+    @Field(() => [Role])
+    @ManyToMany(() => Role)
+    @JoinTable({
+        name: 'user_roles',
+        joinColumn: { name: 'user_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
+    })
+    userRoles: Role[];
 }

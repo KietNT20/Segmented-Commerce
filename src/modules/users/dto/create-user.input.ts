@@ -1,7 +1,8 @@
 import { Field, ID, InputType } from '@nestjs/graphql';
 import {
+    ArrayUnique,
+    IsArray,
     IsEmail,
-    IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
@@ -11,7 +12,7 @@ import {
     MinLength,
 } from 'class-validator';
 import { REGEX } from 'src/constants';
-import { Role } from '../enums';
+import { Gender } from '../enums/gender.enum';
 
 @InputType()
 export class CreateUserInput {
@@ -49,10 +50,16 @@ export class CreateUserInput {
     })
     phone?: string;
 
-    @Field(() => Role, { description: 'User role' })
+    @Field(() => Gender, { nullable: true, description: 'User gender' })
+    @IsOptional()
+    gender?: Gender;
+
+    @Field(() => [ID], { description: 'List of Role IDs assigned to user' })
+    @IsArray()
+    @ArrayUnique()
+    @IsUUID('4', { each: true })
     @IsNotEmpty()
-    @IsEnum(Role)
-    role: Role;
+    userRoleIds: string[];
 
     @Field(() => ID, { nullable: true, description: 'Customer ID' })
     @IsOptional()

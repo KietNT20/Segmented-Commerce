@@ -15,6 +15,8 @@ import { ProductPricesModule } from './modules/product_prices/product_prices.mod
 import { ProductUnitModule } from './modules/product_unit/product_unit.module';
 import { ProductsModule } from './modules/products/products.module';
 import { UsersModule } from './modules/users/users.module';
+import { RolesModule } from './modules/roles/roles.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -77,6 +79,8 @@ import { UsersModule } from './modules/users/users.module';
         UsersModule,
         ProductUnitModule,
         ProductPricesModule,
+        RolesModule,
+        PermissionsModule,
     ],
     providers: [
         {

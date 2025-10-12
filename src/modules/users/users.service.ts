@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { jwtDecode } from 'jwt-decode';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
 import { Customer } from '../customers/entities/customer.entity';
 import {
     Paginated,
     SortOrder,
 } from '../pagination/interface/paginated.interface';
+import { Role } from '../roles/entities/role.entity';
 import { CreateUserInput } from './dto/create-user.input';
 import { QueryUserInput } from './dto/query-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -25,6 +26,8 @@ export class UsersService {
         private usersRepository: Repository<User>,
         @InjectRepository(Customer)
         private customersRepository: Repository<Customer>,
+        @InjectRepository(Role)
+        private rolesRepository: Repository<Role>,
         private readonly hashingProvider: HashingProvider,
     ) {}
 
@@ -57,6 +60,24 @@ export class UsersService {
             }
         }
 
+        if (createUserInput.customerId) {
+            const customer = await this.customersRepository.findOneBy({
+                id: createUserInput.customerId,
+            });
+
+            if (!customer) {
+                throw new NotFoundException('Customer not found');
+            }
+        }
+
+        const roles = await this.rolesRepository.findBy({
+            id: In(createUserInput.userRoleIds),
+        });
+
+        if (roles.length !== createUserInput.userRoleIds.length) {
+            throw new NotFoundException('One or more roles not found');
+        }
+
         const hashedPassword = await this.hashingProvider.hashPassword(
             createUserInput.password,
         );
@@ -71,26 +92,52 @@ export class UsersService {
 
     async findAll(queryUserInput: QueryUserInput): Promise<Paginated<User>> {
         const {
-            offset = 0,
+            offset = 1,
             limit = 10,
             sortOrder = SortOrder.DESC,
+            email,
+            phone,
+            roles,
         } = queryUserInput;
 
-        const [users, total] = await this.usersRepository.findAndCount({
-            where: {
-                email: queryUserInput.email,
-                phone: queryUserInput.phone,
-                role: queryUserInput.role,
-            },
-            skip: (offset - 1) * limit,
-            take: limit,
-            order: {
-                createdAt: sortOrder,
-            },
-            relations: {
-                customer: true,
-            },
-        });
+        const query = this.usersRepository
+            .createQueryBuilder('user')
+            .leftJoinAndSelect('user.customer', 'customer');
+
+        const needJoinRole = roles && roles.length > 0;
+
+        if (needJoinRole) {
+            query.innerJoin('user.roles', 'role');
+        }
+
+        if (email) {
+            query.andWhere('user.email ILIKE :email', { email: `%${email}%` });
+        }
+
+        if (phone) {
+            query.andWhere('user.phone LIKE :phone', { phone: `%${phone}%` });
+        }
+
+        if (roles && roles.length > 0) {
+            const roleNames = roles.map((r) =>
+                typeof r === 'string' ? r : r.roleName,
+            );
+            query.andWhere('role.roleName IN (:...roleNames)', { roleNames });
+        }
+
+        const total = await query.getCount();
+
+        const users = await query
+            .addSelect([
+                'user.id',
+                'user.email',
+                'user.firstName',
+                'user.lastName',
+            ])
+            .orderBy('user.createdAt', sortOrder)
+            .skip((offset - 1) * limit)
+            .take(limit)
+            .getMany();
 
         return {
             data: users,
@@ -133,7 +180,9 @@ export class UsersService {
         const user = await this.usersRepository.findOneBy({ email });
 
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(
+                `Account with email ${email} not found`,
+            );
         }
 
         return user;
@@ -143,7 +192,7 @@ export class UsersService {
         const user = await this.usersRepository.findOneBy({ id });
 
         if (!user) {
-            throw new NotFoundException('User not found');
+            throw new NotFoundException(`User with id ${id} not found`);
         }
 
         const hashedRefreshToken =
