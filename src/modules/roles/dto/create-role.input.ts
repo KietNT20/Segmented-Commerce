@@ -12,5 +12,5 @@ export class CreateRoleInput {
     @Field(() => [Permission])
     @ValidateNested()
     @Type(() => Permission)
-    permissionIds: Permission[];
+    permissionds: Permission[];
 }

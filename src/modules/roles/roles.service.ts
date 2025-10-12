@@ -29,8 +29,7 @@ export class RolesService {
         return this.rolesRepository.save({ ...updateRoleInput, id });
     }
 
-    async remove(id: string): Promise<string> {
+    async remove(id: string): Promise<void> {
         await this.rolesRepository.delete(id);
-        return `Role with id ${id} removed successfully`;
     }
 }
