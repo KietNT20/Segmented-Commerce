@@ -1,35 +1,92 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+    RequireAllPermissions,
+    RequireAnyPermission,
+    RequirePermission,
+} from 'src/decorators/permission.decorator';
+import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
+import { PermissionGuard } from 'src/guards/permission.guard';
 import { CreateRoleInput } from './dto/create-role.input';
 import { UpdateRoleInput } from './dto/update-role.input';
 import { Role } from './entities/role.entity';
+import { Action, Resource } from './enums';
 import { RolesService } from './roles.service';
 
 @Resolver(() => Role)
+@UseGuards(GqlAuthGuard, PermissionGuard)
 export class RolesResolver {
     constructor(private readonly rolesService: RolesService) {}
 
     @Mutation(() => Role)
+    @RequirePermission(Resource.ROLES, Action.CREATE)
     createRole(@Args('createRoleInput') createRoleInput: CreateRoleInput) {
         return this.rolesService.create(createRoleInput);
     }
 
     @Query(() => [Role], { name: 'roles' })
+    @RequirePermission(Resource.ROLES, Action.READ)
     findAll() {
         return this.rolesService.findAll();
     }
 
     @Query(() => Role, { name: 'role' })
+    @RequirePermission(Resource.ROLES, Action.READ)
     findOne(@Args('id', { type: () => ID }) id: string) {
         return this.rolesService.findOne(id);
     }
 
     @Mutation(() => Role)
+    @RequirePermission(Resource.ROLES, Action.UPDATE)
     updateRole(@Args('updateRoleInput') updateRoleInput: UpdateRoleInput) {
         return this.rolesService.update(updateRoleInput.id, updateRoleInput);
     }
 
     @Mutation(() => Role)
+    @RequirePermission(Resource.ROLES, Action.DELETE)
     removeRole(@Args('id', { type: () => ID }) id: string) {
         return this.rolesService.remove(id);
+    }
+
+    // Ví dụ về quyền phức tạp: User có thể update role HOẶC có quyền delete role
+    @Mutation(() => Role)
+    @RequireAnyPermission([
+        { resource: Resource.ROLES, action: Action.UPDATE },
+        { resource: Resource.ROLES, action: Action.DELETE },
+    ])
+    updateOrDeleteRole(
+        @Args('updateRoleInput') updateRoleInput: UpdateRoleInput,
+    ) {
+        return this.rolesService.update(updateRoleInput.id, updateRoleInput);
+    }
+
+    // Ví dụ về quyền phức tạp: User phải có quyền READ cả ROLES và USERS
+    @Query(() => [Role], { name: 'rolesWithUsers' })
+    @RequireAllPermissions([
+        { resource: Resource.ROLES, action: Action.READ },
+        { resource: Resource.USERS, action: Action.READ },
+    ])
+    findRolesWithUsers(): Promise<Role[]> {
+        return this.rolesService.findAllWithUsers();
+    }
+
+    // Ví dụ về quyền đặc biệt: Chỉ admin mới có thể assign role cho user
+    @Mutation(() => Role)
+    @RequirePermission(Resource.ROLES, Action.UPDATE)
+    assignRoleToUser(
+        @Args('roleId', { type: () => ID }) roleId: string,
+        @Args('userId', { type: () => ID }) userId: string,
+    ): Promise<Role> {
+        return this.rolesService.assignRoleToUser(roleId, userId);
+    }
+
+    // Remove role from user
+    @Mutation(() => Role)
+    @RequirePermission(Resource.ROLES, Action.UPDATE)
+    removeRoleFromUser(
+        @Args('roleId', { type: () => ID }) roleId: string,
+        @Args('userId', { type: () => ID }) userId: string,
+    ): Promise<Role> {
+        return this.rolesService.removeRoleFromUser(roleId, userId);
     }
 }

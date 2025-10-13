@@ -3,13 +3,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BcryptProvider } from '../auth/providers/bcrypt.provider';
 import { HashingProvider } from '../auth/providers/hashing.provider';
 import { Customer } from '../customers/entities/customer.entity';
+import { PermissionsModule } from '../permissions/permissions.module';
 import { Role } from '../roles/entities/role.entity';
 import { User } from './entities/user.entity';
 import { UsersResolver } from './users.resolver';
 import { UsersService } from './users.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([User, Customer, Role])],
+    imports: [
+        TypeOrmModule.forFeature([User, Customer, Role]),
+        PermissionsModule,
+    ],
     providers: [
         UsersResolver,
         UsersService,

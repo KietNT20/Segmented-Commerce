@@ -4,8 +4,10 @@ export enum Resource {
     USERS = 'users',
     ROLES = 'roles',
     CUSTOMERS = 'customers',
-    BUSINESSES = 'businesses',
+    CUSTOMER_SEGMENTS = 'customer_segments',
     PRODUCTS = 'products',
+    PRODUCT_PRICES = 'product_prices',
+    PRODUCT_UNITS = 'product_units',
     SETTINGS = 'settings',
 }
 
