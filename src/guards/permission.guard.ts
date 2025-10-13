@@ -69,8 +69,9 @@ export class PermissionGuard implements CanActivate {
         // Handle GraphQL context
         if (context.getType<string>() === 'graphql') {
             const gqlContext = GqlExecutionContext.create(context);
-            const contextData: { req?: GraphQLRequest } =
-                gqlContext.getContext();
+            const contextData = gqlContext.getContext<{
+                req?: GraphQLRequest;
+            }>();
             const request = contextData.req;
             return request?.user || null;
         }
