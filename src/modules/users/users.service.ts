@@ -161,7 +161,12 @@ export class UsersService {
     }
 
     findOne(id: string): Promise<User | null> {
-        return this.usersRepository.findOneBy({ id });
+        return this.usersRepository.findOne({
+            where: { id },
+            relations: {
+                userRoles: true,
+            },
+        });
     }
 
     async update(id: string, updateUserInput: UpdateUserInput): Promise<User> {
