@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     ConflictException,
     ForbiddenException,
     Injectable,
@@ -32,62 +33,49 @@ export class UsersService {
     ) {}
 
     async create(createUserInput: CreateUserInput): Promise<User> {
-        const existingUserEmail = await this.usersRepository.findOneBy({
-            email: createUserInput.email,
+        const { email, phone, customerId, userRoleIds, password } =
+            createUserInput;
+
+        const existingUser = await this.usersRepository.findOne({
+            where: [{ email }, ...(phone ? [{ phone }] : [])],
         });
 
-        if (existingUserEmail) {
-            throw new ConflictException('Email already exists');
-        }
-
-        if (createUserInput.phone) {
-            const existingUserPhone = await this.usersRepository.findOneBy({
-                phone: createUserInput.phone,
-            });
-
-            if (existingUserPhone) {
+        if (existingUser) {
+            if (existingUser.email === email) {
+                throw new ConflictException('Email already exists');
+            }
+            if (existingUser.phone === phone) {
                 throw new ConflictException('Phone number already exists');
             }
         }
 
-        if (createUserInput.customerId) {
+        if (customerId) {
             const customer = await this.customersRepository.findOneBy({
-                id: createUserInput.customerId,
+                id: customerId,
             });
-
-            if (!customer) {
-                throw new NotFoundException('Customer not found');
-            }
+            if (!customer) throw new NotFoundException('Customer not found');
         }
 
-        if (createUserInput.customerId) {
-            const customer = await this.customersRepository.findOneBy({
-                id: createUserInput.customerId,
-            });
-
-            if (!customer) {
-                throw new NotFoundException('Customer not found');
-            }
+        if (!userRoleIds?.length) {
+            throw new BadRequestException('User must have at least one role');
         }
 
         const roles = await this.rolesRepository.findBy({
-            id: In(createUserInput.userRoleIds),
+            id: In(userRoleIds),
         });
-
-        if (roles.length !== createUserInput.userRoleIds.length) {
+        if (roles.length !== userRoleIds.length) {
             throw new NotFoundException('One or more roles not found');
         }
 
-        const hashedPassword = await this.hashingProvider.hashPassword(
-            createUserInput.password,
-        );
+        const hashedPassword =
+            await this.hashingProvider.hashPassword(password);
 
-        const createdUser = this.usersRepository.create({
+        const newUser = this.usersRepository.create({
             ...createUserInput,
             password: hashedPassword,
         });
 
-        return this.usersRepository.save(createdUser);
+        return this.usersRepository.save(newUser);
     }
 
     async findAll(queryUserInput: QueryUserInput): Promise<Paginated<User>> {
@@ -98,44 +86,68 @@ export class UsersService {
             email,
             phone,
             roleIds,
+            firstName,
+            lastName,
+            orderBy = 'createdAt',
         } = queryUserInput;
 
-        const query = this.usersRepository
-            .createQueryBuilder('user')
-            .leftJoinAndSelect('user.customer', 'customer');
+        const validOrderFields = [
+            'email',
+            'firstName',
+            'lastName',
+            'createdAt',
+        ];
 
-        const needJoinRole = roleIds && roleIds.length > 0;
+        const orderField = validOrderFields.includes(orderBy)
+            ? orderBy
+            : 'createdAt';
 
-        if (needJoinRole) {
-            query.innerJoin('user.userRoles', 'userRole');
-            query.innerJoin('userRole.role', 'role');
+        const query = this.usersRepository.createQueryBuilder('user');
+
+        query.leftJoin('user.customer', 'customer');
+
+        if (roleIds?.length) {
+            query
+                .innerJoin('user.userRoles', 'userRole')
+                .innerJoin(
+                    'userRole.role',
+                    'role',
+                    'role.id IN (:...roleIds)',
+                    { roleIds },
+                );
         }
 
         if (email) {
             query.andWhere('user.email ILIKE :email', { email: `%${email}%` });
         }
 
+        if (firstName) {
+            query.andWhere('user.firstName ILIKE :firstName', {
+                firstName: `%${firstName}%`,
+            });
+        }
+
+        if (lastName) {
+            query.andWhere('user.lastName ILIKE :lastName', {
+                lastName: `%${lastName}%`,
+            });
+        }
+
         if (phone) {
             query.andWhere('user.phone LIKE :phone', { phone: `%${phone}%` });
         }
 
-        if (roleIds && roleIds.length > 0) {
-            query.andWhere('role.id IN (:...roleIds)', { roleIds });
-        }
-
-        const total = await query.getCount();
-
-        const users = await query
+        const [users, total] = await query
             .addSelect([
                 'user.id',
                 'user.email',
                 'user.firstName',
                 'user.lastName',
             ])
-            .orderBy('user.createdAt', sortOrder)
+            .orderBy(`user.${orderField}`, sortOrder)
             .skip((offset - 1) * limit)
             .take(limit)
-            .getMany();
+            .getManyAndCount();
 
         return {
             data: users,
