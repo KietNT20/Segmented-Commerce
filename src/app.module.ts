@@ -11,12 +11,12 @@ import { join } from 'path';
 import { AuthModule } from './modules/auth/auth.module';
 import { CustomerSegmentsModule } from './modules/customer_segments/customer_segments.module';
 import { CustomersModule } from './modules/customers/customers.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
 import { ProductPricesModule } from './modules/product_prices/product_prices.module';
 import { ProductUnitModule } from './modules/product_unit/product_unit.module';
 import { ProductsModule } from './modules/products/products.module';
-import { UsersModule } from './modules/users/users.module';
 import { RolesModule } from './modules/roles/roles.module';
-import { PermissionsModule } from './modules/permissions/permissions.module';
+import { UsersModule } from './modules/users/users.module';
 @Module({
     imports: [
         ConfigModule.forRoot({
@@ -30,9 +30,9 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
                 DATABASE_PASSWORD: Joi.string().required(),
                 DATABASE_NAME: Joi.string().required(),
                 JWT_SECRET: Joi.string().required(),
-                JWT_EXPIRES_IN: Joi.string().default('60s'),
+                JWT_EXPIRES_IN: Joi.string().default('1m'),
                 JWT_REFRESH_SECRET: Joi.string().required(),
-                JWT_REFRESH_EXPIRES_IN: Joi.string().default('7d'),
+                JWT_REFRESH_EXPIRES_IN: Joi.string().default('7 days'),
                 REDIS_HOST: Joi.string().default('localhost'),
                 REDIS_PORT: Joi.number().port().default(6379),
             }),

@@ -1,0 +1,18 @@
+services:
+    backend:
+        container_name: nestjs_backend
+        build: .
+        ports:
+            - '3000:3000'
+
+        environment:
+            DATABASE_HOST: host.docker.internal
+            DATABASE_PORT: 5432
+            DATABASE_USER: postgres
+            DATABASE_PASSWORD: Admin@123
+            DATABASE_NAME: segmented_commerce_db
+
+            REDIS_HOST: host.docker.internal
+            REDIS_PORT: 6379
+
+        restart: unless-stopped
