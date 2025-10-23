@@ -63,6 +63,7 @@ export class UsersService {
         const roles = await this.rolesRepository.findBy({
             id: In(userRoleIds),
         });
+
         if (roles.length !== userRoleIds.length) {
             throw new NotFoundException('One or more roles not found');
         }
@@ -73,6 +74,7 @@ export class UsersService {
         const newUser = this.usersRepository.create({
             ...createUserInput,
             password: hashedPassword,
+            userRoles: roles,
         });
 
         return this.usersRepository.save(newUser);

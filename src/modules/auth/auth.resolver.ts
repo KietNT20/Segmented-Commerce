@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from 'src/decorators/user.decorator';
 import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
+import { GqlLocalAuthGuard } from 'src/guards/local-auth.guard';
 import { User } from '../users/entities/user.entity';
 import { AuthService } from './auth.service';
 import { LoginInput } from './dto/login.input';
@@ -12,9 +13,10 @@ import { SignupInput } from './dto/signup.input';
 export class AuthResolver {
     constructor(private readonly authService: AuthService) {}
 
+    @UseGuards(GqlLocalAuthGuard)
     @Mutation(() => LoginOutput)
-    async signin(@Args('signinInput') signinInput: LoginInput) {
-        return this.authService.loginUser(signinInput);
+    async signin(@CurrentUser() user: User, @Args('loginInput') _: LoginInput) {
+        return this.authService.loginUser(user);
     }
 
     @Mutation(() => User)

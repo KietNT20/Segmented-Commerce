@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
-import { LoginInput } from './dto/login.input';
 import { LoginOutput } from './dto/login.output';
 import { SignupInput } from './dto/signup.input';
 import { JwtPayload } from './interfaces/jwt.interface';
@@ -20,17 +19,17 @@ export class AuthService {
         private readonly configService: ConfigService,
     ) {}
 
-    async loginUser(loginInput: LoginInput): Promise<LoginOutput> {
-        const user = await this.validateUser(
-            loginInput.email,
-            loginInput.password,
+    async loginUser(user: User): Promise<LoginOutput> {
+        const validatedUser = await this.validateUser(
+            user.email,
+            user.password,
         );
 
         const payload: JwtPayload = {
-            email: user!.email,
-            sub: user!.id,
-            full_name: `${user!.firstName} ${user!.lastName}`,
-            role_ids: user!.userRoles.map((role) => role.id),
+            email: validatedUser!.email,
+            sub: validatedUser!.id,
+            full_name: `${validatedUser!.firstName} ${validatedUser!.lastName}`,
+            role_ids: validatedUser!.userRoles.map((role) => role.id),
         };
 
         const accessToken = this.jwtService.sign(payload, {
@@ -43,7 +42,10 @@ export class AuthService {
             expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
         });
 
-        await this.usersService.updateRefreshToken(user!.id, refreshToken);
+        await this.usersService.updateRefreshToken(
+            validatedUser!.id,
+            refreshToken,
+        );
 
         return {
             access_token: accessToken,

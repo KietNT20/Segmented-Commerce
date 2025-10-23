@@ -160,6 +160,7 @@ type LoginOutput {
 }
 
 type Mutation {
+  assignRoleToUser(roleId: ID!, userId: ID!): Role!
   createCustomer(createCustomerInput: CreateCustomerInput!): Customer!
   createCustomerSegment(createCustomerSegmentInput: CreateCustomerSegmentInput!): CustomerSegment!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
@@ -176,12 +177,14 @@ type Mutation {
   removeProductPrice(id: ID!): ProductPrice!
   removeProductUnit(id: ID!): Boolean!
   removeRole(id: ID!): Role!
+  removeRoleFromUser(roleId: ID!, userId: ID!): Role!
   removeUser(id: String!): User!
-  signin(signinInput: LoginInput!): LoginOutput!
+  signin(loginInput: LoginInput!): LoginOutput!
   signup(signupInput: SignupInput!): User!
   softRemoveCustomer(id: ID!): Customer!
   updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!
   updateCustomerSegment(updateCustomerSegmentInput: UpdateCustomerSegmentInput!): CustomerSegment!
+  updateOrDeleteRole(updateRoleInput: UpdateRoleInput!): Role!
   updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   updateProductPrice(updateProductPriceInput: UpdateProductPriceInput!): ProductPrice!
@@ -270,6 +273,7 @@ type Query {
   products(queryProductInput: QueryProductInput!): [Product!]!
   role(id: ID!): Role!
   roles: [Role!]!
+  rolesWithUsers: [Role!]!
   user(id: String!): User!
   users(queryUserInput: QueryUserInput!): [User!]!
 }
@@ -314,8 +318,11 @@ input QueryProductPriceInput {
 
 input QueryUserInput {
   email: String
+  firstName: String
+  lastName: String
   limit: Int! = 10
   offset: Int! = 0
+  orderBy: String
   phone: String
   roleIds: [ID!]
   sortOrder: SortOrder = DESC
@@ -323,9 +330,11 @@ input QueryUserInput {
 
 """Resource enum for access control"""
 enum Resource {
-  BUSINESSES
   CUSTOMERS
+  CUSTOMER_SEGMENTS
   PRODUCTS
+  PRODUCT_PRICES
+  PRODUCT_UNITS
   ROLES
   SETTINGS
   USERS
