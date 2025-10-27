@@ -179,7 +179,7 @@ type Mutation {
   removeRole(id: ID!): Role!
   removeRoleFromUser(roleId: ID!, userId: ID!): Role!
   removeUser(id: String!): User!
-  signin(loginInput: LoginInput!): LoginOutput!
+  signin(signinInput: LoginInput!): LoginOutput!
   signup(signupInput: SignupInput!): User!
   softRemoveCustomer(id: ID!): Customer!
   updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!
@@ -191,6 +191,38 @@ type Mutation {
   updateProductUnit(updateProductUnitInput: UpdateProductUnitInput!): ProductUnit!
   updateRole(updateRoleInput: UpdateRoleInput!): Role!
   updateUser(updateUserInput: UpdateUserInput!): User!
+}
+
+type PaginatedCustomer {
+  data: [Customer!]!
+  meta: PaginationMeta!
+}
+
+type PaginatedCustomerSegment {
+  data: [CustomerSegment!]!
+  meta: PaginationMeta!
+}
+
+type PaginatedProduct {
+  data: [Product!]!
+  meta: PaginationMeta!
+}
+
+type PaginatedProductPrice {
+  data: [ProductPrice!]!
+  meta: PaginationMeta!
+}
+
+type PaginatedUser {
+  data: [User!]!
+  meta: PaginationMeta!
+}
+
+type PaginationMeta {
+  currentPage: Int!
+  itemsPerPage: Int!
+  totalItems: Int!
+  totalPages: Int!
 }
 
 type Permission {
@@ -260,22 +292,22 @@ type ProductUnit {
 type Query {
   customer(id: ID!): Customer!
   customerSegment(id: ID!): CustomerSegment!
-  customerSegments(queryCustomerSegmentInput: QueryCustomerSegmentInput!): [CustomerSegment!]!
-  customers(queryCustomerInput: QueryCustomerInput!): [Customer!]!
+  customerSegments(queryCustomerSegmentInput: QueryCustomerSegmentInput!): PaginatedCustomerSegment!
+  customers(queryCustomerInput: QueryCustomerInput!): PaginatedCustomer!
   me: User!
   permission(id: ID!): Permission!
   permissions: [Permission!]!
   product(id: ID!): Product!
   productPrice(id: ID!): ProductPrice!
-  productPrices(queryProductPriceInput: QueryProductPriceInput!): [ProductPrice!]!
+  productPrices(queryProductPriceInput: QueryProductPriceInput!): PaginatedProductPrice!
   productUnit(id: ID!): ProductUnit!
   productUnits: [ProductUnit!]!
-  products(queryProductInput: QueryProductInput!): [Product!]!
+  products(queryProductInput: QueryProductInput!): PaginatedProduct!
   role(id: ID!): Role!
   roles: [Role!]!
   rolesWithUsers: [Role!]!
   user(id: String!): User!
-  users(queryUserInput: QueryUserInput!): [User!]!
+  users(queryUserInput: QueryUserInput!): PaginatedUser!
 }
 
 input QueryCustomerInput {

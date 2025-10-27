@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-    Paginated,
-    SortOrder,
-} from '../pagination/interface/paginated.interface';
+import { SortOrder } from '../pagination/interface/paginated.interface';
 import { CreateCustomerInput } from './dto/create-customer.input';
-import { QueryCustomerInput } from './dto/query-customer.input';
+import {
+    PaginatedCustomer,
+    QueryCustomerInput,
+} from './dto/query-customer.input';
 import { UpdateCustomerInput } from './dto/update-customer.input';
 import { Customer } from './entities/customer.entity';
 
@@ -23,7 +23,7 @@ export class CustomersService {
 
     async findAll(
         queryCustomerInput: QueryCustomerInput,
-    ): Promise<Paginated<Customer>> {
+    ): Promise<PaginatedCustomer> {
         const {
             offset = 0,
             limit = 10,

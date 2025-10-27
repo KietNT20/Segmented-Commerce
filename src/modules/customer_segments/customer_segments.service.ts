@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-    Paginated,
-    SortOrder,
-} from '../pagination/interface/paginated.interface';
+import { SortOrder } from '../pagination/interface/paginated.interface';
 import { CreateCustomerSegmentInput } from './dto/create-customer_segment.input';
-import { QueryCustomerSegmentInput } from './dto/query-customer_segment.input';
+import {
+    PaginatedCustomerSegment,
+    QueryCustomerSegmentInput,
+} from './dto/query-customer_segment.input';
 import { UpdateCustomerSegmentInput } from './dto/update-customer_segment.input';
 import { CustomerSegment } from './entities/customer_segment.entity';
 
@@ -28,7 +28,7 @@ export class CustomerSegmentsService {
 
     async findAll(
         queryCustomerSegmentInput: QueryCustomerSegmentInput,
-    ): Promise<Paginated<CustomerSegment>> {
+    ): Promise<PaginatedCustomerSegment> {
         const {
             customerSegmentCode,
             name,

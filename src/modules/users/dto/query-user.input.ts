@@ -1,6 +1,14 @@
-import { Field, ID, InputType, IntersectionType } from '@nestjs/graphql';
+import {
+    Field,
+    ID,
+    InputType,
+    IntersectionType,
+    ObjectType,
+} from '@nestjs/graphql';
 import { IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { PaginationInput } from 'src/modules/pagination/dto/pagination.input';
+import { Paginated } from 'src/modules/pagination/interface/paginated.interface';
+import { User } from '../entities/user.entity';
 
 @InputType()
 export class FilterUserInput {
@@ -41,3 +49,6 @@ export class QueryUserInput extends IntersectionType(
     FilterUserInput,
     PaginationInput,
 ) {}
+
+@ObjectType()
+export class PaginatedUser extends Paginated(User) {}

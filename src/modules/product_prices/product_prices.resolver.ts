@@ -1,6 +1,9 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CreateProductPriceInput } from './dto/create-product_price.input';
-import { QueryProductPriceInput } from './dto/query-product_price.input';
+import {
+    PaginatedProductPrice,
+    QueryProductPriceInput,
+} from './dto/query-product_price.input';
 import { UpdateProductPriceInput } from './dto/update-product_price.input';
 import { ProductPrice } from './entities/product_price.entity';
 import { ProductPricesService } from './product_prices.service';
@@ -17,7 +20,7 @@ export class ProductPricesResolver {
         return this.productPricesService.create(createProductPriceInput);
     }
 
-    @Query(() => [ProductPrice], { name: 'productPrices' })
+    @Query(() => PaginatedProductPrice, { name: 'productPrices' })
     findAll(
         @Args('queryProductPriceInput')
         queryProductPriceInput: QueryProductPriceInput,

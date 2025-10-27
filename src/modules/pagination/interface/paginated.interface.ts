@@ -1,14 +1,5 @@
-import { registerEnumType } from '@nestjs/graphql';
-
-export interface Paginated<T> {
-    data: T[];
-    meta: {
-        totalPages: number;
-        totalItems: number;
-        currentPage: number;
-        itemsPerPage: number;
-    };
-}
+import { Type } from '@nestjs/common';
+import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
 
 export enum SortOrder {
     ASC = 'ASC',
@@ -18,3 +9,35 @@ export enum SortOrder {
 registerEnumType(SortOrder, {
     name: 'SortOrder',
 });
+
+@ObjectType()
+export class PaginationMeta {
+    @Field(() => Int)
+    totalPages: number;
+
+    @Field(() => Int)
+    totalItems: number;
+
+    @Field(() => Int)
+    currentPage: number;
+
+    @Field(() => Int)
+    itemsPerPage: number;
+}
+
+export function Paginated<T>(TItemClass: Type<T>): any {
+    // Tự động tạo tên class, ví dụ: "PaginatedUser"
+    @ObjectType(`Paginated${TItemClass.name}`)
+    abstract class PaginatedType {
+        // Tạo field 'data' là một mảng của TItemClass
+        @Field(() => [TItemClass])
+        data: T[];
+
+        // Sử dụng lại class PaginationMeta đã tạo ở Bước 1
+        @Field(() => PaginationMeta)
+        meta: PaginationMeta;
+    }
+
+    // Trả về class vừa tạo
+    return PaginatedType;
+}

@@ -1,4 +1,4 @@
-import { Field, InputType, Int } from '@nestjs/graphql';
+import { ArgsType, Field, Int } from '@nestjs/graphql';
 import {
     IsEnum,
     IsNumber,
@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { SortOrder } from '../interface/paginated.interface';
 
-@InputType()
+@ArgsType()
 export class PaginationInput {
     @Field(() => SortOrder, { nullable: true, defaultValue: SortOrder.DESC })
     @IsOptional()
@@ -19,7 +19,7 @@ export class PaginationInput {
     @Field(() => Int, { defaultValue: 0 })
     @IsOptional()
     @IsNumber()
-    @IsPositive()
+    @Min(0)
     offset?: number = 0;
 
     @Field(() => Int, { defaultValue: 10 })

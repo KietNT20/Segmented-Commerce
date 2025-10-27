@@ -10,13 +10,10 @@ import { jwtDecode } from 'jwt-decode';
 import { In, Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
 import { Customer } from '../customers/entities/customer.entity';
-import {
-    Paginated,
-    SortOrder,
-} from '../pagination/interface/paginated.interface';
+import { SortOrder } from '../pagination/interface/paginated.interface';
 import { Role } from '../roles/entities/role.entity';
 import { CreateUserInput } from './dto/create-user.input';
-import { QueryUserInput } from './dto/query-user.input';
+import { PaginatedUser, QueryUserInput } from './dto/query-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 
@@ -80,9 +77,9 @@ export class UsersService {
         return this.usersRepository.save(newUser);
     }
 
-    async findAll(queryUserInput: QueryUserInput): Promise<Paginated<User>> {
+    async findAll(queryUserInput: QueryUserInput): Promise<PaginatedUser> {
         const {
-            offset = 1,
+            offset = 0,
             limit = 10,
             sortOrder = SortOrder.DESC,
             email,
@@ -107,6 +104,7 @@ export class UsersService {
         const query = this.usersRepository.createQueryBuilder('user');
 
         query.leftJoin('user.customer', 'customer');
+        query.leftJoinAndSelect('user.userRoles', 'userRole');
 
         if (roleIds?.length) {
             query
@@ -140,14 +138,8 @@ export class UsersService {
         }
 
         const [users, total] = await query
-            .addSelect([
-                'user.id',
-                'user.email',
-                'user.firstName',
-                'user.lastName',
-            ])
             .orderBy(`user.${orderField}`, sortOrder)
-            .skip((offset - 1) * limit)
+            .skip(offset * limit)
             .take(limit)
             .getManyAndCount();
 
@@ -194,7 +186,12 @@ export class UsersService {
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        const user = await this.usersRepository.findOneBy({ email });
+        const user = await this.usersRepository.findOne({
+            where: { email },
+            relations: {
+                userRoles: true,
+            },
+        });
 
         if (!user) {
             throw new NotFoundException(

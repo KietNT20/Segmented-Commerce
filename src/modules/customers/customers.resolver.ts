@@ -6,7 +6,10 @@ import { PermissionGuard } from 'src/guards/permission.guard';
 import { Action, Resource } from '../roles/enums';
 import { CustomersService } from './customers.service';
 import { CreateCustomerInput } from './dto/create-customer.input';
-import { QueryCustomerInput } from './dto/query-customer.input';
+import {
+    PaginatedCustomer,
+    QueryCustomerInput,
+} from './dto/query-customer.input';
 import { UpdateCustomerInput } from './dto/update-customer.input';
 import { Customer } from './entities/customer.entity';
 
@@ -23,7 +26,7 @@ export class CustomersResolver {
         return this.customersService.create(createCustomerInput);
     }
 
-    @Query(() => [Customer], { name: 'customers' })
+    @Query(() => PaginatedCustomer, { name: 'customers' })
     @RequirePermission(Resource.CUSTOMERS, Action.READ)
     findAll(
         @Args('queryCustomerInput') queryCustomerInput: QueryCustomerInput,

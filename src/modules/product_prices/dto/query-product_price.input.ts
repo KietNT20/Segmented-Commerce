@@ -1,6 +1,14 @@
-import { Field, InputType, Int, IntersectionType } from '@nestjs/graphql';
+import {
+    Field,
+    InputType,
+    Int,
+    IntersectionType,
+    ObjectType,
+} from '@nestjs/graphql';
 import { IsNumber, IsPositive, Min } from 'class-validator';
 import { PaginationInput } from 'src/modules/pagination/dto/pagination.input';
+import { Paginated } from 'src/modules/pagination/interface/paginated.interface';
+import { ProductPrice } from '../entities/product_price.entity';
 
 @InputType()
 export class QueryProductPriceFilter {
@@ -20,3 +28,6 @@ export class QueryProductPriceInput extends IntersectionType(
     QueryProductPriceFilter,
     PaginationInput,
 ) {}
+
+@ObjectType()
+export class PaginatedProductPrice extends Paginated(ProductPrice) {}

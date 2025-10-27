@@ -1,15 +1,10 @@
-export interface JwtPayload {
-    sub: string;
-    full_name: string;
+import { JwtPayload } from 'jwt-decode';
+
+export interface JwtInfo extends JwtPayload {
     email: string;
-    role_ids: string[];
+    user_roles: string[];
 }
 
-export type JwtWithRefreshToken = JwtPayload & {
+export type JwtWithRefreshToken = JwtInfo & {
     refresh_token: string;
 };
-
-export interface JwtDecoded extends JwtPayload {
-    iat: number;
-    exp: number;
-}

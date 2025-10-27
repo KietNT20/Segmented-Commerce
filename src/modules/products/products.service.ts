@@ -1,12 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-    Paginated,
-    SortOrder,
-} from '../pagination/interface/paginated.interface';
+import { SortOrder } from '../pagination/interface/paginated.interface';
 import { CreateProductInput } from './dto/create-product.input';
-import { QueryProductInput } from './dto/query-product.input';
+import { PaginatedProduct, QueryProductInput } from './dto/query-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { Product } from './entities/product.entity';
 
@@ -24,7 +21,7 @@ export class ProductsService {
 
     async findAll(
         queryProductInput: QueryProductInput,
-    ): Promise<Paginated<Product>> {
+    ): Promise<PaginatedProduct> {
         const {
             productName,
             productSKU,
