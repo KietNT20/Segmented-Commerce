@@ -9,6 +9,7 @@ export enum Resource {
     PRODUCT_PRICES = 'product_prices',
     PRODUCT_UNITS = 'product_units',
     SETTINGS = 'settings',
+    PERMISSIONS = 'permissions',
 }
 
 registerEnumType(Resource, {

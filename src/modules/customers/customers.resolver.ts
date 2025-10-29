@@ -1,6 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { RequirePermission } from 'src/decorators/permission.decorator';
+import {
+    RequireAllPermissions,
+    RequirePermission,
+} from 'src/decorators/permission.decorator';
 import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission.guard';
 import { Action, Resource } from '../roles/enums';
@@ -13,8 +16,8 @@ import {
 import { UpdateCustomerInput } from './dto/update-customer.input';
 import { Customer } from './entities/customer.entity';
 
-@Resolver(() => Customer)
 @UseGuards(GqlAuthGuard, PermissionGuard)
+@Resolver(() => Customer)
 export class CustomersResolver {
     constructor(private readonly customersService: CustomersService) {}
 
@@ -41,7 +44,12 @@ export class CustomersResolver {
     }
 
     @Mutation(() => Customer)
-    @RequirePermission(Resource.CUSTOMERS, Action.UPDATE)
+    @RequireAllPermissions([
+        { resource: Resource.CUSTOMERS, action: Action.UPDATE },
+        { resource: Resource.CUSTOMERS, action: Action.DELETE },
+        { resource: Resource.USERS, action: Action.UPDATE },
+        { resource: Resource.USERS, action: Action.DELETE },
+    ])
     updateCustomer(
         @Args('updateCustomerInput') updateCustomerInput: UpdateCustomerInput,
     ) {
@@ -58,7 +66,11 @@ export class CustomersResolver {
     }
 
     @Mutation(() => Customer)
-    @RequirePermission(Resource.CUSTOMERS, Action.DELETE)
+    @RequireAllPermissions([
+        { resource: Resource.CUSTOMERS, action: Action.DELETE },
+        { resource: Resource.USERS, action: Action.UPDATE },
+        { resource: Resource.USERS, action: Action.DELETE },
+    ])
     removeCustomer(@Args('id', { type: () => ID }) id: string) {
         return this.customersService.remove(id);
     }

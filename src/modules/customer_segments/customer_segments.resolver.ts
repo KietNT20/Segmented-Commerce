@@ -1,4 +1,6 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CustomerSegmentsService } from './customer_segments.service';
 import { CreateCustomerSegmentInput } from './dto/create-customer_segment.input';
 import {
@@ -8,6 +10,7 @@ import {
 import { UpdateCustomerSegmentInput } from './dto/update-customer_segment.input';
 import { CustomerSegment } from './entities/customer_segment.entity';
 
+@UseGuards(GqlAuthGuard)
 @Resolver(() => CustomerSegment)
 export class CustomerSegmentsResolver {
     constructor(

@@ -13,8 +13,8 @@ import { Role } from './entities/role.entity';
 import { Action, Resource } from './enums';
 import { RolesService } from './roles.service';
 
-@Resolver(() => Role)
 @UseGuards(GqlAuthGuard, PermissionGuard)
+@Resolver(() => Role)
 export class RolesResolver {
     constructor(private readonly rolesService: RolesService) {}
 
@@ -48,7 +48,6 @@ export class RolesResolver {
         return this.rolesService.remove(id);
     }
 
-    // Ví dụ về quyền phức tạp: User có thể update role HOẶC có quyền delete role
     @Mutation(() => Role)
     @RequireAnyPermission([
         { resource: Resource.ROLES, action: Action.UPDATE },
@@ -60,7 +59,6 @@ export class RolesResolver {
         return this.rolesService.update(updateRoleInput.id, updateRoleInput);
     }
 
-    // Ví dụ về quyền phức tạp: User phải có quyền READ cả ROLES và USERS
     @Query(() => [Role], { name: 'rolesWithUsers' })
     @RequireAllPermissions([
         { resource: Resource.ROLES, action: Action.READ },
@@ -70,7 +68,6 @@ export class RolesResolver {
         return this.rolesService.findAllWithUsers();
     }
 
-    // Ví dụ về quyền đặc biệt: Chỉ admin mới có thể assign role cho user
     @Mutation(() => Role)
     @RequirePermission(Resource.ROLES, Action.UPDATE)
     assignRoleToUser(
@@ -80,7 +77,6 @@ export class RolesResolver {
         return this.rolesService.assignRoleToUser(roleId, userId);
     }
 
-    // Remove role from user
     @Mutation(() => Role)
     @RequirePermission(Resource.ROLES, Action.UPDATE)
     removeRoleFromUser(

@@ -1,5 +1,8 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { RequirePermission } from 'src/decorators/permission.decorator';
+import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
+import { PermissionGuard } from 'src/guards/permission.guard';
 import { Action, Resource } from '../roles/enums';
 import { CreateUserInput } from './dto/create-user.input';
 import { PaginatedUser, QueryUserInput } from './dto/query-user.input';
@@ -7,19 +10,19 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
+@UseGuards(GqlAuthGuard, PermissionGuard)
 @Resolver(() => User)
-// @UseGuards(GqlAuthGuard, PermissionGuard)
 export class UsersResolver {
     constructor(private readonly usersService: UsersService) {}
 
     @Mutation(() => User)
-    // @RequirePermission(Resource.USERS, Action.CREATE)
+    @RequirePermission(Resource.USERS, Action.CREATE)
     createUser(@Args('createUserInput') createUserInput: CreateUserInput) {
         return this.usersService.create(createUserInput);
     }
 
     @Query(() => PaginatedUser, { name: 'users' })
-    // @RequirePermission(Resource.USERS, Action.READ)
+    @RequirePermission(Resource.USERS, Action.READ)
     findAll(
         @Args('queryUserInput', { type: () => QueryUserInput })
         queryUserInput: QueryUserInput,
@@ -28,7 +31,7 @@ export class UsersResolver {
     }
 
     @Query(() => User, { name: 'user' })
-    // @RequirePermission(Resource.USERS, Action.READ)
+    @RequirePermission(Resource.USERS, Action.READ)
     findOne(@Args('id', { type: () => String }) id: string) {
         return this.usersService.findOne(id);
     }
