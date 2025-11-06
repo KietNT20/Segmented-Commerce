@@ -30,7 +30,6 @@ export class User {
     email: string;
 
     @Field(() => String)
-    @Exclude()
     @Column('varchar', { length: 150 })
     password: string;
 
