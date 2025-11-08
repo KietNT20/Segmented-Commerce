@@ -1,4 +1,6 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateProductPriceInput } from './dto/create-product_price.input';
 import {
     PaginatedProductPrice,
@@ -8,6 +10,7 @@ import { UpdateProductPriceInput } from './dto/update-product_price.input';
 import { ProductPrice } from './entities/product_price.entity';
 import { ProductPricesService } from './product_prices.service';
 
+@UseGuards(GqlAuthGuard)
 @Resolver(() => ProductPrice)
 export class ProductPricesResolver {
     constructor(private readonly productPricesService: ProductPricesService) {}

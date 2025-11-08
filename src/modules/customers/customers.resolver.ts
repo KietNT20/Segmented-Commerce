@@ -2,6 +2,7 @@ import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
     RequireAllPermissions,
+    RequireAnyPermission,
     RequirePermission,
 } from 'src/decorators/permission.decorator';
 import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
@@ -22,7 +23,10 @@ export class CustomersResolver {
     constructor(private readonly customersService: CustomersService) {}
 
     @Mutation(() => Customer)
-    @RequirePermission(Resource.CUSTOMERS, Action.CREATE)
+    @RequireAnyPermission([
+        { resource: Resource.CUSTOMERS, action: Action.CREATE },
+        { resource: Resource.USERS, action: Action.CREATE },
+    ])
     createCustomer(
         @Args('createCustomerInput') createCustomerInput: CreateCustomerInput,
     ) {
@@ -46,9 +50,7 @@ export class CustomersResolver {
     @Mutation(() => Customer)
     @RequireAllPermissions([
         { resource: Resource.CUSTOMERS, action: Action.UPDATE },
-        { resource: Resource.CUSTOMERS, action: Action.DELETE },
         { resource: Resource.USERS, action: Action.UPDATE },
-        { resource: Resource.USERS, action: Action.DELETE },
     ])
     updateCustomer(
         @Args('updateCustomerInput') updateCustomerInput: UpdateCustomerInput,
@@ -60,7 +62,10 @@ export class CustomersResolver {
     }
 
     @Mutation(() => Customer)
-    @RequirePermission(Resource.CUSTOMERS, Action.DELETE)
+    @RequireAllPermissions([
+        { resource: Resource.CUSTOMERS, action: Action.DELETE },
+        { resource: Resource.USERS, action: Action.DELETE },
+    ])
     softRemoveCustomer(@Args('id', { type: () => ID }) id: string) {
         return this.customersService.softRemove(id);
     }
@@ -68,7 +73,6 @@ export class CustomersResolver {
     @Mutation(() => Customer)
     @RequireAllPermissions([
         { resource: Resource.CUSTOMERS, action: Action.DELETE },
-        { resource: Resource.USERS, action: Action.UPDATE },
         { resource: Resource.USERS, action: Action.DELETE },
     ])
     removeCustomer(@Args('id', { type: () => ID }) id: string) {

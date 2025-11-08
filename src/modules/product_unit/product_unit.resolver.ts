@@ -1,9 +1,12 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
 import { CreateProductUnitInput } from './dto/create-product_unit.input';
 import { UpdateProductUnitInput } from './dto/update-product_unit.input';
 import { ProductUnit } from './entities/product_unit.entity';
 import { ProductUnitService } from './product_unit.service';
 
+@UseGuards(GqlAuthGuard)
 @Resolver(() => ProductUnit)
 export class ProductUnitResolver {
     constructor(private readonly productUnitService: ProductUnitService) {}
