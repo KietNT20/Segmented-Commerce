@@ -5,7 +5,7 @@ import { Request } from 'express';
 
 @Injectable()
 export class GqlLocalAuthGuard extends AuthGuard('local') {
-    getRequest(context: ExecutionContext): Request {
+    getRequest(context: ExecutionContext): any {
         const gqlExecutionContext = GqlExecutionContext.create(context);
         const gqlContext = gqlExecutionContext.getContext<{ req: Request }>();
         const gqlArgs: Record<string, unknown> = gqlExecutionContext.getArgs();

@@ -532,7 +532,7 @@ type User {
   gender: Gender
   id: ID!
   lastName: String!
-  password: String!
+  password: String
   phone: String
   refreshToken: String
   updatedAt: DateTime

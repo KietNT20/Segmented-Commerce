@@ -158,7 +158,9 @@ export class UsersService {
         return this.usersRepository.findOne({
             where: { id },
             relations: {
-                userRoles: true,
+                userRoles: {
+                    permissions: true,
+                },
             },
         });
     }

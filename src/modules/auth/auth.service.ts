@@ -33,7 +33,6 @@ export class AuthService {
         const payload: JwtInfo = {
             email: validatedUser.email,
             sub: validatedUser.id,
-            user_roles: validatedUser.userRoles.map((role) => role.roleName),
         };
 
         const accessToken = this.jwtService.sign(payload, {
@@ -72,13 +71,12 @@ export class AuthService {
             await this.usersService.findByRefreshToken(oldRefreshToken);
 
         if (!user) {
-            throw new UnauthorizedException();
+            throw new UnauthorizedException('Invalid refresh token');
         }
 
         const payload: JwtInfo = {
             email: user.email,
             sub: user.id,
-            user_roles: user.userRoles.map((role) => role.roleName),
         };
 
         const accessToken = this.jwtService.sign(payload, {
@@ -114,6 +112,18 @@ export class AuthService {
         return null;
     }
 
+    async getUserInfo(userId: string): Promise<User> {
+        const user = await this.usersService.findOne(userId);
+
+        if (!user) {
+            throw new UnauthorizedException(
+                'Oh no! You are not authorized to access this resource',
+            );
+        }
+
+        return user;
+    }
+
     verifyToken(token: string) {
         try {
             const decoded = this.jwtService.verify<JwtInfo>(token, {
@@ -122,7 +132,7 @@ export class AuthService {
             return decoded;
         } catch (error) {
             this.logger.error(error);
-            throw new UnauthorizedException('Invalid token');
+            throw new UnauthorizedException('Invalid access token');
         }
     }
 }

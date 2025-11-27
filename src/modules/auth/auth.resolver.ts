@@ -27,9 +27,9 @@ export class AuthResolver {
         return this.authService.refreshToken(refreshToken);
     }
 
-    @Query(() => User)
     @UseGuards(GqlAuthGuard)
+    @Query(() => User)
     me(@CurrentUser() user: User) {
-        return user;
+        return this.authService.getUserInfo(user.id);
     }
 }

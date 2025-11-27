@@ -29,9 +29,10 @@ export class User {
     @Column('varchar', { length: 255, unique: true })
     email: string;
 
-    @Field(() => String)
+    @Field(() => String, { nullable: true })
     @Column('varchar', { length: 150 })
-    password: string;
+    @Exclude()
+    password: string | null;
 
     @Field(() => String)
     @Column('varchar', { length: 255, name: 'first_name' })
