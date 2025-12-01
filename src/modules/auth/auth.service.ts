@@ -56,14 +56,20 @@ export class AuthService {
         };
     }
 
-    async registerUser(signupInput: SignupInput): Promise<User> {
+    async registerUser(
+        signupInput: SignupInput,
+    ): Promise<{ user: User; message: string }> {
         const createdUser = await this.usersService.create({
             ...signupInput,
-            userRoleIds: signupInput.roleIds,
             gender: undefined,
+            userRoleIds: [],
         });
 
-        return createdUser;
+        return {
+            user: createdUser,
+            message:
+                'User registered successfully. Waiting for admin approval.',
+        };
     }
 
     async refreshToken(oldRefreshToken: string) {

@@ -1,13 +1,10 @@
-import { Field, ID, InputType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
 import {
-    ArrayUnique,
-    IsArray,
     IsEmail,
     IsEnum,
     IsNotEmpty,
     IsOptional,
     IsString,
-    IsUUID,
     Matches,
     MaxLength,
     MinLength,
@@ -49,13 +46,6 @@ export class SignupInput {
         message: 'Phone number must be a valid Vietnamese phone number',
     })
     phone?: string;
-
-    @Field(() => [ID], { description: 'List of Role IDs assigned to user' })
-    @IsArray()
-    @ArrayUnique()
-    @IsUUID('4', { each: true })
-    @IsNotEmpty()
-    roleIds: string[];
 
     @Field(() => Gender, { nullable: true, description: 'User gender' })
     @IsOptional()
