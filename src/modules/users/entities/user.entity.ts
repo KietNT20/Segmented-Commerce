@@ -32,7 +32,7 @@ export class User {
     @Field(() => String, { nullable: true })
     @Column('varchar', { length: 150 })
     @Exclude()
-    password: string | null;
+    password: string;
 
     @Field(() => String)
     @Column('varchar', { length: 255, name: 'first_name' })
@@ -59,7 +59,7 @@ export class User {
     @Field(() => String, { nullable: true })
     @Column('varchar', { nullable: true, name: 'refresh_token' })
     @Exclude()
-    refreshToken?: string;
+    refreshToken: string;
 
     @Field(() => GraphQLISODateTime, { nullable: true })
     @CreateDateColumn({ name: 'created_at' })
