@@ -153,7 +153,7 @@ export class AuthService {
         return null;
     }
 
-    async getUserInfo(userId: string): Promise<User> {
+    async getUserInfo(userId: string): Promise<User | null> {
         const user = await this.usersService.findOne(userId);
 
         if (!user) {

@@ -204,7 +204,10 @@ export class UsersService {
         return user;
     }
 
-    async updateRefreshToken(id: string, refreshToken: string) {
+    async updateRefreshToken(
+        id: string,
+        refreshToken: string,
+    ): Promise<User | null> {
         const user = await this.usersRepository.findOneBy({ id });
 
         if (!user) {
