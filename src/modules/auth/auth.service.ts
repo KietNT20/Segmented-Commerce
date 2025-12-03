@@ -73,11 +73,45 @@ export class AuthService {
     }
 
     async refreshToken(oldRefreshToken: string) {
-        const user =
-            await this.usersService.findByRefreshToken(oldRefreshToken);
+        // 1. Verify JWT signature và expiration - đảm bảo token hợp lệ và chưa hết hạn
+        let decodedPayload: JwtInfo;
+        try {
+            decodedPayload = this.jwtService.verify<JwtInfo>(oldRefreshToken, {
+                secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+            });
+        } catch (error) {
+            this.logger.error('Invalid refresh token', error);
+            throw new UnauthorizedException('Invalid or expired refresh token');
+        }
+
+        // 2. Lấy user từ userId trong token đã verify
+        const user = await this.usersService.findOne(decodedPayload.sub!);
 
         if (!user) {
-            throw new UnauthorizedException('Invalid refresh token');
+            throw new UnauthorizedException('User not found');
+        }
+
+        // 3. Kiểm tra user có refreshToken trong database không
+        // Điều này đảm bảo user đã đăng nhập và có session hợp lệ
+        if (!user.refreshToken) {
+            throw new UnauthorizedException(
+                'No refresh token found for this user. Please login again.',
+            );
+        }
+
+        // 4. Kiểm tra refreshToken có khớp với token đã lưu trong database
+        // Điều này đảm bảo refreshToken thuộc về user đó và chưa bị thay đổi
+        // Lưu ý: Vì mỗi lần refresh tạo token mới, token cũ sẽ bị vô hiệu hóa
+        // (Token rotation - mỗi token chỉ dùng được 1 lần, tăng cường bảo mật)
+        const isValidToken = await this.usersService.validateRefreshToken(
+            user.id,
+            oldRefreshToken,
+        );
+
+        if (!isValidToken) {
+            throw new UnauthorizedException(
+                'Refresh token does not match. Please login again.',
+            );
         }
 
         const payload: JwtInfo = {
@@ -95,6 +129,7 @@ export class AuthService {
             expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
         });
 
+        // Lưu refreshToken mới vào database
         await this.usersService.updateRefreshToken(user.id, refreshToken);
 
         return {

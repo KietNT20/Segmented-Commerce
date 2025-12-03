@@ -234,4 +234,26 @@ export class UsersService {
 
         return user;
     }
+
+    /**
+     * Kiểm tra refreshToken có khớp với token đã lưu trong database không
+     */
+    async validateRefreshToken(
+        userId: string,
+        refreshToken: string,
+    ): Promise<boolean> {
+        const user = await this.usersRepository.findOneBy({ id: userId });
+
+        if (!user || !user.refreshToken) {
+            return false;
+        }
+
+        // So sánh refreshToken đã hash với token đã lưu
+        const isMatch = await this.hashingProvider.comparePassword(
+            refreshToken,
+            user.refreshToken,
+        );
+
+        return isMatch;
+    }
 }
