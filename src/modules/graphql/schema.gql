@@ -397,9 +397,6 @@ input SignupInput {
 
   """User phone number"""
   phone: String
-
-  """List of Role IDs assigned to user"""
-  roleIds: [ID!]!
 }
 
 enum SortOrder {

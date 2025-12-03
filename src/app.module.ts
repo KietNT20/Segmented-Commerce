@@ -8,6 +8,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthModule } from './modules/auth/auth.module';
 import { CustomerSegmentsModule } from './modules/customer_segments/customer_segments.module';
 import { CustomersModule } from './modules/customers/customers.module';
@@ -83,10 +85,12 @@ import { UsersModule } from './modules/users/users.module';
         PermissionsModule,
     ],
     providers: [
+        AppService,
         {
             provide: APP_INTERCEPTOR,
             useClass: ClassSerializerInterceptor,
         },
     ],
+    controllers: [AppController],
 })
 export class AppModule {}
