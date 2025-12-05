@@ -1,12 +1,13 @@
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'jwt-decode';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { LoginInput } from './dto/login.input';
 import { LoginOutput } from './dto/login.output';
 import { SignupInput } from './dto/signup.input';
-import { JwtInfo } from './interfaces/jwt.interface';
+import { JwtAccessToken } from './interfaces/jwt.interface';
 import { HashingProvider } from './providers/hashing.provider';
 
 @Injectable()
@@ -30,8 +31,12 @@ export class AuthService {
             throw new UnauthorizedException('Invalid email or password');
         }
 
-        const payload: JwtInfo = {
+        const payload: JwtAccessToken = {
             email: validatedUser.email,
+            sub: validatedUser.id,
+        };
+
+        const refreshTokenPayload: JwtPayload = {
             sub: validatedUser.id,
         };
 
@@ -40,7 +45,7 @@ export class AuthService {
             expiresIn: this.configService.get('JWT_EXPIRES_IN'),
         });
 
-        const refreshToken = this.jwtService.sign(payload, {
+        const refreshToken = this.jwtService.sign(refreshTokenPayload, {
             secret: this.configService.get('JWT_REFRESH_SECRET'),
             expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
         });
@@ -74,11 +79,16 @@ export class AuthService {
 
     async refreshToken(oldRefreshToken: string) {
         // 1. Verify JWT signature và expiration - đảm bảo token hợp lệ và chưa hết hạn
-        let decodedPayload: JwtInfo;
+        let decodedPayload: JwtPayload;
         try {
-            decodedPayload = this.jwtService.verify<JwtInfo>(oldRefreshToken, {
-                secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-            });
+            decodedPayload = this.jwtService.verify<JwtPayload>(
+                oldRefreshToken,
+                {
+                    secret: this.configService.get<string>(
+                        'JWT_REFRESH_SECRET',
+                    ),
+                },
+            );
         } catch (error) {
             this.logger.error('Invalid refresh token', error);
             throw new UnauthorizedException('Invalid or expired refresh token');
@@ -114,8 +124,12 @@ export class AuthService {
             );
         }
 
-        const payload: JwtInfo = {
+        const payload: JwtAccessToken = {
             email: user.email,
+            sub: user.id,
+        };
+
+        const refreshTokenPayload: JwtPayload = {
             sub: user.id,
         };
 
@@ -124,7 +138,7 @@ export class AuthService {
             expiresIn: this.configService.get('JWT_EXPIRES_IN'),
         });
 
-        const refreshToken = this.jwtService.sign(payload, {
+        const refreshToken = this.jwtService.sign(refreshTokenPayload, {
             secret: this.configService.get('JWT_REFRESH_SECRET'),
             expiresIn: this.configService.get('JWT_REFRESH_EXPIRES_IN'),
         });
@@ -167,7 +181,7 @@ export class AuthService {
 
     verifyToken(token: string) {
         try {
-            const decoded = this.jwtService.verify<JwtInfo>(token, {
+            const decoded = this.jwtService.verify<JwtAccessToken>(token, {
                 secret: this.configService.get<string>('JWT_SECRET'),
             });
             return decoded;

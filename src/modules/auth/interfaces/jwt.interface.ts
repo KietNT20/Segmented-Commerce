@@ -1,5 +1,5 @@
 import { JwtPayload } from 'jwt-decode';
 
-export interface JwtInfo extends JwtPayload {
+export interface JwtAccessToken extends JwtPayload {
     email: string;
 }
