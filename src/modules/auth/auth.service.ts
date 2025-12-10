@@ -155,16 +155,20 @@ export class AuthService {
     async validateUser(email: string, password: string): Promise<User | null> {
         const user = await this.usersService.findByEmail(email);
 
-        const authenticated = await this.hashingProvider.comparePassword(
-            password,
-            user?.password as string,
-        );
-
-        if (user && authenticated) {
-            return user;
+        if (!user) {
+            throw new UnauthorizedException('Invalid email or password');
         }
 
-        return null;
+        const authenticated = await this.hashingProvider.comparePassword(
+            password,
+            user?.password,
+        );
+
+        if (!authenticated) {
+            return null;
+        }
+
+        return user;
     }
 
     async getUserInfo(userId: string): Promise<User | null> {

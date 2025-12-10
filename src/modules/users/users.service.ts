@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { jwtDecode } from 'jwt-decode';
-import { In, Repository } from 'typeorm';
+import { FindOptionsWhere, In, Not, Repository } from 'typeorm';
 import { HashingProvider } from '../auth/providers/hashing.provider';
 import { Customer } from '../customers/entities/customer.entity';
 import { SortOrder } from '../pagination/interface/paginated.interface';
@@ -33,18 +33,7 @@ export class UsersService {
         const { email, phone, customerId, userRoleIds, password } =
             createUserInput;
 
-        const existingUser = await this.usersRepository.findOne({
-            where: [{ email }, ...(phone ? [{ phone }] : [])],
-        });
-
-        if (existingUser) {
-            if (existingUser.email === email) {
-                throw new ConflictException('Email already exists');
-            }
-            if (existingUser.phone === phone) {
-                throw new ConflictException('Phone number already exists');
-            }
-        }
+        await this.checkUserExists(email, phone ?? '');
 
         if (customerId) {
             const customer = await this.customersRepository.findOneBy({
@@ -172,6 +161,12 @@ export class UsersService {
             throw new NotFoundException('User not found');
         }
 
+        await this.checkUserExists(
+            updateUserInput.email ?? user.email,
+            updateUserInput.phone ?? user.phone ?? '',
+            id,
+        );
+
         const updatedUser = this.usersRepository.merge(user, updateUserInput);
 
         return this.usersRepository.save(updatedUser);
@@ -195,13 +190,35 @@ export class UsersService {
             },
         });
 
-        if (!user) {
-            throw new NotFoundException(
-                `Account with email ${email} not found`,
-            );
+        return user;
+    }
+
+    async checkUserExists(
+        email: string,
+        phone: string,
+        excludeId?: string,
+    ): Promise<void> {
+        const whereConditions: FindOptionsWhere<User>[] = [{ email }];
+
+        if (phone) {
+            whereConditions.push({ phone });
         }
 
-        return user;
+        const existingUser = await this.usersRepository.findOne({
+            where: whereConditions.map((condition) => ({
+                ...condition,
+                ...(excludeId && { id: Not(excludeId) }),
+            })),
+        });
+
+        if (existingUser) {
+            if (existingUser.email === email) {
+                throw new ConflictException('Email already exists');
+            }
+            if (existingUser.phone === phone) {
+                throw new ConflictException('Phone number already exists');
+            }
+        }
     }
 
     async updateRefreshToken(
