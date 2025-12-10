@@ -25,12 +25,12 @@ export class PaginationMeta {
     itemsPerPage: number;
 }
 
-export function Paginated<T>(TItemClass: Type<T>): any {
+export function Paginated<T>(ItemClass: Type<T>): any {
     // Tự động tạo tên class, ví dụ: "PaginatedUser"
-    @ObjectType(`Paginated${TItemClass.name}`)
+    @ObjectType(`Paginated${ItemClass.name}`)
     abstract class PaginatedType {
         // Tạo field 'data' là một mảng của TItemClass
-        @Field(() => [TItemClass])
+        @Field(() => [ItemClass])
         data: T[];
 
         // Sử dụng lại class PaginationMeta đã tạo ở Bước 1
