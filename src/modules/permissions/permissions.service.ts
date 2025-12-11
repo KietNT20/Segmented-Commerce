@@ -37,7 +37,7 @@ export class PermissionsService {
         });
 
         if (!havingPermission) {
-            throw new NotFoundException(`Permission with id ${id} not found`);
+            throw new NotFoundException('Permission not found');
         }
 
         const updatedPermission = this.permissionRepository.merge(
@@ -48,16 +48,11 @@ export class PermissionsService {
         return this.permissionRepository.save(updatedPermission);
     }
 
-    async remove(id: string): Promise<Permission | null> {
-        const havingPermission = await this.permissionRepository.findOneBy({
-            id,
-        });
-
-        if (!havingPermission) {
-            throw new NotFoundException(`Permission with id ${id} not found`);
+    async remove(id: string): Promise<void> {
+        const deletedPermission = await this.permissionRepository.delete(id);
+        if (!deletedPermission) {
+            throw new NotFoundException('Permission not found');
         }
-
-        return this.permissionRepository.remove(havingPermission);
     }
 
     /**

@@ -173,13 +173,11 @@ export class UsersService {
     }
 
     async remove(id: string): Promise<void> {
-        const user = await this.usersRepository.findOneBy({ id });
+        const deletedUser = await this.usersRepository.delete(id);
 
-        if (!user) {
+        if (!deletedUser) {
             throw new NotFoundException('User not found');
         }
-
-        await this.usersRepository.remove(user);
     }
 
     async findByEmail(email: string): Promise<User | null> {

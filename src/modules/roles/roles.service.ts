@@ -83,7 +83,10 @@ export class RolesService {
     }
 
     async remove(id: string): Promise<void> {
-        await this.rolesRepository.delete(id);
+        const deletedRole = await this.rolesRepository.delete(id);
+        if (!deletedRole) {
+            throw new NotFoundException('Role not found');
+        }
     }
 
     /**

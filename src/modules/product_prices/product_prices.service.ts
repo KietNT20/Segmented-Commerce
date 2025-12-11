@@ -87,12 +87,10 @@ export class ProductPricesService {
     }
 
     async remove(id: string): Promise<void> {
-        const productPrice = await this.productPriceRepository.findOne({
-            where: { id },
-        });
-        if (!productPrice) {
+        const deletedProductPrice =
+            await this.productPriceRepository.delete(id);
+        if (!deletedProductPrice) {
             throw new NotFoundException('Product price not found');
         }
-        await this.productPriceRepository.remove(productPrice);
     }
 }

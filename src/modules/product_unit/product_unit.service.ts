@@ -80,12 +80,9 @@ export class ProductUnitService {
     }
 
     async remove(id: string): Promise<void> {
-        const unit = await this.productUnitRepository.findOne({
-            where: { id },
-        });
-        if (!unit) {
+        const deletedUnit = await this.productUnitRepository.delete(id);
+        if (!deletedUnit) {
             throw new NotFoundException('Product unit not found');
         }
-        await this.productUnitRepository.remove(unit);
     }
 }

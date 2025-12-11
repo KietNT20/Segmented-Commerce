@@ -85,13 +85,10 @@ export class CustomerSegmentsService {
     }
 
     async remove(id: string): Promise<void> {
-        const customerSegment = await this.customerSegmentRepository.findOneBy({
-            id,
-        });
-
-        if (!customerSegment) {
+        const deletedCustomerSegment =
+            await this.customerSegmentRepository.delete(id);
+        if (!deletedCustomerSegment) {
             throw new NotFoundException('Customer segment not found');
         }
-        await this.customerSegmentRepository.delete(id);
     }
 }
