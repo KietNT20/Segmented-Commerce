@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Permission } from '../permissions/entities/permission.etity';
 import { User } from '../users/entities/user.entity';
+import { ADMIN_ROLE_NAME } from './constants/role.constants';
 import { CreateRoleInput } from './dto/create-role.input';
 import { UpdateRoleInput } from './dto/update-role.input';
 import { Role } from './entities/role.entity';
@@ -87,6 +88,15 @@ export class RolesService {
         if (!deletedRole) {
             throw new NotFoundException('Role not found');
         }
+    }
+
+    async createAdminRole(): Promise<Role> {
+        const role = this.rolesRepository.create({
+            roleName: ADMIN_ROLE_NAME,
+            permissions: [],
+        });
+
+        return this.rolesRepository.save(role);
     }
 
     /**

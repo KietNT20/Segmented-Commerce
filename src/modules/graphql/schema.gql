@@ -161,6 +161,7 @@ type LoginOutput {
 
 type Mutation {
   assignRoleToUser(roleId: ID!, userId: ID!): Role!
+  createAdminRole: Role!
   createCustomer(createCustomerInput: CreateCustomerInput!): Customer!
   createCustomerSegment(createCustomerSegmentInput: CreateCustomerSegmentInput!): CustomerSegment!
   createPermission(createPermissionInput: CreatePermissionInput!): Permission!
@@ -184,7 +185,6 @@ type Mutation {
   softRemoveCustomer(id: ID!): Customer!
   updateCustomer(updateCustomerInput: UpdateCustomerInput!): Customer!
   updateCustomerSegment(updateCustomerSegmentInput: UpdateCustomerSegmentInput!): CustomerSegment!
-  updateOrDeleteRole(updateRoleInput: UpdateRoleInput!): Role!
   updatePermission(updatePermissionInput: UpdatePermissionInput!): Permission!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   updateProductPrice(updateProductPriceInput: UpdateProductPriceInput!): ProductPrice!

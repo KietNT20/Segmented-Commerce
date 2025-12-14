@@ -2,9 +2,9 @@ import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import {
     RequireAllPermissions,
-    RequireAnyPermission,
     RequirePermission,
 } from 'src/decorators/permission.decorator';
+import { Public } from 'src/decorators/public.decorator';
 import { GqlAuthGuard } from 'src/guards/jwt-auth.guard';
 import { PermissionGuard } from 'src/guards/permission.guard';
 import { CreateRoleInput } from './dto/create-role.input';
@@ -49,14 +49,9 @@ export class RolesResolver {
     }
 
     @Mutation(() => Role)
-    @RequireAnyPermission([
-        { resource: Resource.ROLES, action: Action.UPDATE },
-        { resource: Resource.ROLES, action: Action.DELETE },
-    ])
-    updateOrDeleteRole(
-        @Args('updateRoleInput') updateRoleInput: UpdateRoleInput,
-    ) {
-        return this.rolesService.update(updateRoleInput.id, updateRoleInput);
+    @Public()
+    createAdminRole(): Promise<Role> {
+        return this.rolesService.createAdminRole();
     }
 
     @Query(() => [Role], { name: 'rolesWithUsers' })

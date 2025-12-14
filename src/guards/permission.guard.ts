@@ -49,6 +49,13 @@ export class PermissionGuard implements CanActivate {
             throw new ForbiddenException('User not authenticated');
         }
 
+        // Admin role bypass: Admin có full access tự động với mọi resource và action
+        // Không cần check permissions trong database, kể cả với resource mới được thêm sau này
+        const userIsAdmin = await this.permissionsService.isAdmin(user);
+        if (userIsAdmin) {
+            return true;
+        }
+
         // Check permission
         const hasPermission = await this.checkPermission(
             user,

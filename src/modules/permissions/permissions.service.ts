@@ -1,7 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ADMIN_ROLE_NAME } from '../roles/constants/role.constants';
 import { Action, Resource } from '../roles/enums';
+import { User } from '../users/entities/user.entity';
 import { CreatePermissionInput } from './dto/create-permission.input';
 import { UpdatePermissionInput } from './dto/update-permission.input';
 import { Permission } from './entities/permission.etity';
@@ -56,13 +58,95 @@ export class PermissionsService {
     }
 
     /**
+     * Tạo permissions cho admin role - full access to all resources and actions
+     * Method này đảm bảo admin luôn có quyền với mọi resource hiện tại và tương lai
+     * @returns Mảng permissions với tất cả resources và actions
+     */
+    private getAdminPermissions(): Array<{
+        resource: Resource;
+        action: Action[];
+    }> {
+        const allResources = Object.values(Resource);
+        const allActions = Object.values(Action);
+
+        return allResources.map((resource) => ({
+            resource,
+            action: allActions,
+        }));
+    }
+
+    /**
+     * Kiểm tra user có role admin không
+     * Admin role được phân biệt bằng roleName === ADMIN_ROLE_NAME
+     * Admin không cần permissions trong database vì có full access tự động
+     * @param user - User entity hoặc userId
+     * @returns true nếu user có role admin
+     */
+    async isAdmin(user: User | string): Promise<boolean> {
+        if (typeof user === 'string') {
+            const userEntity = await this.permissionRepository.manager
+                .getRepository(User)
+                .findOne({
+                    where: { id: user },
+                    relations: { userRoles: true },
+                });
+
+            if (!userEntity) {
+                return false;
+            }
+
+            return userEntity.userRoles.some(
+                (role) => role.roleName === ADMIN_ROLE_NAME,
+            );
+        }
+
+        if (!user.userRoles) {
+            const userEntity = await this.permissionRepository.manager
+                .getRepository(User)
+                .findOne({
+                    where: { id: user.id },
+                    relations: { userRoles: true },
+                });
+
+            if (!userEntity) {
+                return false;
+            }
+
+            return userEntity.userRoles.some(
+                (role) => role.roleName === ADMIN_ROLE_NAME,
+            );
+        }
+
+        return user.userRoles.some((role) => role.roleName === ADMIN_ROLE_NAME);
+    }
+
+    /**
      * Lấy tất cả quyền của user thông qua các role
+     * Admin role: Trả về full permissions cho tất cả resources và actions (tự động bao gồm resource mới)
+     * Other roles: Trả về permissions được gán trong database
      * @param userId - ID của user
      * @returns Mảng các quyền với resource và action
      */
     async getUserPermissions(
         userId: string,
     ): Promise<Array<{ resource: Resource; action: Action[] }>> {
+        const user = await this.permissionRepository.manager
+            .getRepository(User)
+            .findOne({
+                where: { id: userId },
+                relations: { userRoles: true },
+            });
+
+        if (!user) {
+            return [];
+        }
+
+        const userIsAdmin = await this.isAdmin(user);
+
+        if (userIsAdmin) {
+            return this.getAdminPermissions();
+        }
+
         const permissions = await this.permissionRepository
             .createQueryBuilder('permission')
             .innerJoin('permission.roles', 'role')
@@ -79,8 +163,10 @@ export class PermissionsService {
 
     /**
      * Kiểm tra user có quyền cụ thể trên resource không
+     * Admin role: Luôn trả về true (full access)
+     * Other roles: Kiểm tra permissions trong database
      * @param userId - ID của user
-     * @param resource - Resource cần kiểm tra
+     * @param resource - Resource cần kiểm tra (có thể là resource mới)
      * @param action - Action cần kiểm tra
      * @returns true nếu có quyền, false nếu không
      */
@@ -89,6 +175,12 @@ export class PermissionsService {
         resource: Resource,
         action: Action,
     ): Promise<boolean> {
+        const userIsAdmin = await this.isAdmin(userId);
+
+        if (userIsAdmin) {
+            return true;
+        }
+
         const userPermissions = await this.getUserPermissions(userId);
 
         return userPermissions.some(
